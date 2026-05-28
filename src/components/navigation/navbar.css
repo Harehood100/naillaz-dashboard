@@ -1,0 +1,54 @@
+.navbar {
+  width: 100%;
+  padding: 24px 60px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-logo {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--white);
+
+  cursor: pointer;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 40px;
+
+  list-style: none;
+}
+
+.navbar-links li {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--white);
+
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.navbar-links li:hover {
+  color: var(--primary);
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.login-btn {
+  background: transparent;
+  border: none;
+
+  color: var(--white);
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
