@@ -88,3 +88,46 @@
 
   margin-top: 16px;
 }
+
+
+@media (max-width: 768px) {
+
+  .hero {
+    padding: 20px;
+  }
+
+  .hero-top {
+    flex-direction: column;
+
+    text-align: center;
+  }
+
+  .hero-text {
+    align-items: center;
+  }
+
+  .hero-text h1 {
+    font-size: 36px;
+  }
+
+  .hero-text h2 {
+    font-size: 18px;
+  }
+
+  .hero-text p {
+    font-size: 14px;
+  }
+
+  .hero-line {
+    width: 140px;
+  }
+
+  .circle-bg {
+    width: 80px;
+    height: 80px;
+
+    top: -10px;
+    right: 10px;
+  }
+
+}

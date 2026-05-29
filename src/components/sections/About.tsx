@@ -2,6 +2,7 @@ import "./About.css";
 import Navbar from "../navigation/navbar";
 import Button from "../UI/button";
 import Image from "next/image";
+import Footer from "../layout/Footer";
 
 export default function About() {
   return (
@@ -68,19 +69,21 @@ export default function About() {
     <div className="about-left-info">
 
       <div className="feature-item">
-
-        <p>Set Saving Goals</p>
+        <p>• Set Saving Goals</p>
         <span>✓</span>
       </div>
 
-      <p>Track Income</p>
+      <div className="feature-item">
+        <p>• Track Income</p>
         <span>✓</span>
+      </div>
 
-      <p>Analyze Expenses</p>
+      <div className="feature-item">
+        <p>• Analyze Expenses</p>
         <span>✓</span>
+      </div>
 
-
-    </div>
+</div>
 
     <div className="vertical-line"></div>
 
@@ -92,11 +95,11 @@ export default function About() {
 
       <span>
         — Marcus Thorne
+        Founder & CEO Linear Labs.
       </span>
 
-      <p className="quote-source">
-        Founder & CEO Linear Labs.
-      </p>
+        
+      
 
     </div>
 
@@ -118,9 +121,11 @@ export default function About() {
 
 </div>
 
+  <Footer />
+
     </section>
 
-
-    
   );
 }
+
+ 

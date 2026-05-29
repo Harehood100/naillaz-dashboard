@@ -52,3 +52,20 @@
 
   cursor: pointer;
 }
+
+
+@media (max-width: 768px) {
+
+  .navbar {
+    padding: 20px;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .nav-buttons {
+    gap: 10px;
+  }
+
+}

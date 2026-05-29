@@ -25,3 +25,11 @@ body {
   color: var(--white);
   font-family: var(--font-family);
 }
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+}
