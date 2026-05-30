@@ -1,55 +1,45 @@
-import Sidebar from "@/components/layout/sidebar";
+import AppLayout from "@/components/layout/AppLayout";
 
 import StatCard from "@/components/dashboard/StatCard";
-import TransactionTable from "@/components/dashboard/TransactionTable";
 import SavingsProgress from "@/components/dashboard/SavingsProgress";
+import TransactionTable from "@/components/dashboard/TransactionTable";
 import AlertCard from "@/components/dashboard/AlertCard";
 
 import "./dashboard.css";
 
 export default function DashboardPage() {
   return (
-    <div className="dashboard-layout">
-      <Sidebar />
+    <AppLayout
+      title="Dashboard"
+      activePage="dashboard"
+    >
+      <div className="stats-grid">
+        <StatCard
+          title="Total Balance"
+          amount="₦250,000"
+        />
 
-      <main className="dashboard-content">
-        <div className="dashboard-header">
-          <h1>Dashboard</h1>
+        <StatCard
+          title="Income"
+          amount="₦120,000"
+        />
 
-          <p>
-            Welcome back to your financial
-            workspace.
-          </p>
-        </div>
+        <StatCard
+          title="Expenses"
+          amount="₦80,000"
+        />
 
-        <div className="stats-grid">
-          <StatCard
-            title="Total Balance"
-            amount="₦250,000"
-          />
+        <StatCard
+          title="Savings"
+          amount="₦50,000"
+        />
+      </div>
 
-          <StatCard
-            title="Income"
-            amount="₦120,000"
-          />
+      <SavingsProgress />
 
-          <StatCard
-            title="Expenses"
-            amount="₦80,000"
-          />
+      <TransactionTable />
 
-          <StatCard
-            title="Savings"
-            amount="₦50,000"
-          />
-        </div>
-
-        <SavingsProgress />
-
-        <TransactionTable />
-
-        <AlertCard />
-      </main>
-    </div>
+      <AlertCard />
+    </AppLayout>
   );
 }
