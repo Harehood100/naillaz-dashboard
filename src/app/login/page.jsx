@@ -13,7 +13,35 @@ import AuthInput from "@/components/auth/AuthInput";
 
 import AuthCard from "@/components/auth/AuthCard";
 
+"use client";
+
+import { useState } from "react";
+
 export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [errors, setErrors] = useState({});
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    let newErrors = {};
+
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    }
+
+    if (!password.trim()) {
+      newErrors.password = "Password is required";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      console.log("Login successful");
+    }
+  };
   return (
     <div className="login-page">
       <div className="login-container">
@@ -24,6 +52,7 @@ export default function LoginPage() {
         {/* CARD */}
 
         <AuthCard>
+          <form onSubmit={handleSubmit}>
           <div className="form-header">
             <h1>Welcome back to your financial workspace</h1>
 
@@ -38,6 +67,14 @@ export default function LoginPage() {
         label="EMAIL ADDRESS"
         type="email"
         placeholder="name@company.com"
+         value={email}
+        onChange={(e) => setEmail(e.target.value)}
+            />
+            {errors.email && (
+        <p className="error-text">
+        {errors.email}
+          </p>
+          )}
         icon={
         <Mail
           size={18}
@@ -59,6 +96,15 @@ export default function LoginPage() {
            <AuthInput
           type="password"
           placeholder="••••••••"
+             value={password}
+onChange={(e) =>
+  setPassword(e.target.value)
+}
+        {errors.password && (
+  <p className="error-text">
+    {errors.password}
+  </p>
+)}     
           icon={
           <Lock
             size={18}
@@ -95,6 +141,10 @@ export default function LoginPage() {
               <span>Sign up</span>
             </Link>
           </div>
+            <form onSubmit={handleSubmit}>
+               ...
+          </form>
+          </AuthCard>
         </AuthCard>
 
         {/* FOOTER */}
