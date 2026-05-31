@@ -1,5 +1,5 @@
 import "./Hero.css";
-import Image from "next/image";
+import Logo from "@/components/common/Logo";
 
 export default function Hero() {
   return (
@@ -9,12 +9,7 @@ export default function Hero() {
         <div className="hero-top">
 
           <div className="hero-logo">
-            <Image
-              src="/logo.png"
-              alt="Naillaz Logo"
-              width={70}
-              height={70}
-            />
+            <Logo size="large" />
           </div>
 
           <div className="hero-text">

@@ -1,11 +1,14 @@
 import "./navbar.css";
+import Logo from "@/components/common/Logo";
+
 import Button from "../UI/button";
 
 export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-logo">
-        NAILLAZ
+        <Logo size="small" />
+       <span> NAILLAZ</span>
       </div>
 
       <ul className="navbar-links">

@@ -14,6 +14,9 @@ type SidebarProps = {
   activePage: string;
 };
 
+import Logo from "@/components/common/Logo";
+
+
 export default function Sidebar({
   activePage,
 }: SidebarProps) {
@@ -23,6 +26,7 @@ export default function Sidebar({
       <div>
   <div className="logo-section">
     <div className="logo-badge">
+      <Logo size="medium" />
       <span className="logo-text">NAILLAZ</span>
     </div>
 

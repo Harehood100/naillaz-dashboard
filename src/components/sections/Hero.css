@@ -89,6 +89,11 @@
   margin-top: 16px;
 }
 
+.hero-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
 
 @media (max-width: 768px) {
 
@@ -130,4 +135,9 @@
     right: 10px;
   }
 
+}
+
+.hero-logo {
+  width: min(87px, 90vw);
+  height: auto;
 }

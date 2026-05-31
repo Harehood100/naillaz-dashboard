@@ -1,0 +1,58 @@
+<svg width="122" height="125" viewBox="0 0 122 125" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Dark navy background -->
+  <path d="M92.3243 0H29.6757C13.2863 0 0 13.613 0 30.4054V94.5946C0 111.387 13.2863 125 29.6757 125H92.3243C108.714 125 122 111.387 122 94.5946V30.4054C122 13.613 108.714 0 92.3243 0Z" fill="#1B2537"/>
+
+  <!-- Subtle white overlay -->
+  <path d="M92.3243 0H29.6757C13.2863 0 0 13.613 0 30.4054V94.5946C0 111.387 13.2863 125 29.6757 125H92.3243C108.714 125 122 111.387 122 94.5946V30.4054C122 13.613 108.714 0 92.3243 0Z" fill="white" fill-opacity="0.08"/>
+
+  <!-- Inner border (Vector-1.svg) centered at (17, 17.5) -->
+  <g transform="translate(17, 17.5)">
+    <path d="M66.4378 0.599976H21.7621C10.0746 0.599976 0.599976 10.2924 0.599976 22.2486V67.9513C0.599976 79.9075 10.0746 89.6 21.7621 89.6H66.4378C78.1254 89.6 87.6 79.9075 87.6 67.9513V22.2486C87.6 10.2924 78.1254 0.599976 66.4378 0.599976Z" stroke="white" stroke-opacity="0.2" stroke-width="1.2"/>
+  </g>
+
+  <!-- Gold circle (12x13) with white circle (7x6) centered inside it -->
+  <!-- Gold circle center at (30, 29): translate(24, 22.5) -->
+  <g transform="translate(24, 22.5)">
+    <path d="M6 13C9.31371 13 12 10.0899 12 6.5C12 2.91015 9.31371 0 6 0C2.68629 0 0 2.91015 0 6.5C0 10.0899 2.68629 13 6 13Z" fill="#F0C040"/>
+  </g>
+  <!-- White circle center at (30, 29): translate(26.5, 26) -->
+  <g transform="translate(26.5, 26)">
+    <path d="M3.5 6C5.433 6 7 4.65685 7 3C7 1.34315 5.433 0 3.5 0C1.567 0 0 1.34315 0 3C0 4.65685 1.567 6 3.5 6Z" fill="white"/>
+  </g>
+
+  <!-- 
+    BARS — staircase layout, each bar starts at a higher baseline.
+    Bars centered horizontally in inner square (inner sq x: 17–105, center x=61).
+    Total bar group width: 14 + 5 + 15 + 5 + 14 = 53px → start x = 61 - 26.5 = 34.5 ≈ 35
+
+    Short  (14x28): x=35,  bottom=92, top=64   → translate(35, 64)
+    Medium (15x41): x=54,  bottom=84, top=43   → translate(54, 43)
+    Tall   (14x58): x=74,  bottom=74, top=16   → translate(74, 16)
+
+    Top-right corners (for gold line):
+      Short:  (35+14, 64) = (49, 64)
+      Medium: (54+15, 43) = (69, 43)
+      Tall:   (74+14, 16) = (88, 16)
+  -->
+
+  <!-- Short bar (14x28) -->
+  <g transform="translate(35, 64)">
+    <path d="M9.91667 0H4.08333C1.82817 0 0 2.43756 0 5.44444V22.5556C0 25.5624 1.82817 28 4.08333 28H9.91667C12.1718 28 14 25.5624 14 22.5556V5.44444C14 2.43756 12.1718 0 9.91667 0Z" fill="white" fill-opacity="0.3"/>
+  </g>
+
+  <!-- Medium bar (15x41) -->
+  <g transform="translate(54, 43)">
+    <path d="M10.625 0H4.375C1.95875 0 0 2.00772 0 4.48438V36.5156C0 38.9923 1.95875 41 4.375 41H10.625C13.0412 41 15 38.9923 15 36.5156V4.48438C15 2.00772 13.0412 0 10.625 0Z" fill="white" fill-opacity="0.6"/>
+  </g>
+
+  <!-- Tall bar (14x58) — moved down so it stays within inner square -->
+  <g transform="translate(74, 26)">
+    <path d="M9.91667 0H4.08333C1.82817 0 0 1.85482 0 4.14286V53.8571C0 56.1452 1.82817 58 4.08333 58H9.91667C12.1718 58 14 56.1452 14 53.8571V4.14286C14 1.85482 12.1718 0 9.91667 0Z" fill="white"/>
+  </g>
+
+  <!-- Gold line: extends into short bar, through medium top-right, to tall top-right.
+       Start inside short bar (38, 75) → medium top-right (69, 43) → tall top-right (88, 26) -->
+  <path d="M38 75 L69 43 L88 26" stroke="#F0C040" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+</svg>

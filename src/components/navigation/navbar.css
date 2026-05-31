@@ -8,11 +8,15 @@
 }
 
 .navbar-logo {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--white);
 
   cursor: pointer;
+
+  display: flex;
+  align-items: center; /* makes icon and text sit on same line */
+  gap: 8px
 }
 
 .navbar-links {

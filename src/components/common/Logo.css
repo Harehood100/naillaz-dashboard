@@ -1,0 +1,35 @@
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+
+.logo-small {
+  gap: 0.5rem;
+}
+
+.logo-small img {
+  width: 25px;
+  height: 20px;
+}
+
+
+.logo-medium {
+  gap: 0.75rem;
+}
+
+.logo-medium img {
+  width: 30px;
+  height: 20px;
+}
+
+
+
+.logo-large {
+  gap: 1rem;
+}
+
+.logo-large img {
+  width: 122px;
+  height: 125px;
+}
