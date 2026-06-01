@@ -64,8 +64,8 @@ export default function ForgotPasswordPage() {
                       onChange={(e) => setEmail(e.target.value)}
                     />
               {error && <p className="error-text">{error}</p>}
-            }
-          />
+            
+         
 
           {/* BUTTON */}
 

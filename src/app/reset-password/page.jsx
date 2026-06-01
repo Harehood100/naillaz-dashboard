@@ -75,9 +75,9 @@ export default function ResetPasswordPage() {
           onChange={(e) => setPassword(e.target.value)}
           />
             {errors.password && <p className="error-text">{errors.password}</p>}
-            }
+      
             password
-          />
+          
 
           {/* CONFIRM */}
 
@@ -91,9 +91,9 @@ export default function ResetPasswordPage() {
           onChange={(e) => setConfirmPassword(e.target.value)}
           />
           {errors.confirmPassword && <p className="error-text">{errors.confirmPassword}</p>}
-            }
+            
             password
-          />
+          
 
           {/* BUTTON */}
 

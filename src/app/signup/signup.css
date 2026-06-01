@@ -117,6 +117,7 @@
   width: 100%;
   max-width: 650px;
   padding: 50px;
+  border-radius: 30px;
 }
 
 .form-card h1 {
@@ -184,33 +185,39 @@ input {
 
 .password-strength {
   display: flex;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.password-strength div {
-  height: 8px;
-  flex: 1;
-  border-radius: 20px;
-}
-
-.red {
-  background: red;
-}
-
-.yellow {
-  background: gold;
-}
-
-.green {
-  background: limegreen;
-}
-
-small {
-  color: gray;
-  display: block;
+  gap: 6px;
   margin-top: 8px;
+  margin-bottom: 8px;
 }
+
+.password-strength {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.strength-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+/* active states */
+.strength-bar.strength-red {
+  background: #ef4444;
+}
+
+.strength-bar.strength-yellow {
+  background: #facc15;
+}
+
+.strength-bar.strength-green {
+  background: #22c55e;
+}
+
 
 .terms {
   display: flex;

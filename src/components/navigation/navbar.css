@@ -1,36 +1,35 @@
 .navbar {
   width: 100%;
   padding: 24px 60px;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
 .navbar-logo {
   font-size: 15px;
   font-weight: 600;
   color: var(--white);
-
   cursor: pointer;
-
   display: flex;
-  align-items: center; /* makes icon and text sit on same line */
-  gap: 8px
+  align-items: center;
+  gap: 8px;
+  z-index: 100;
 }
 
 .navbar-links {
   display: flex;
   gap: 40px;
-
   list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .navbar-links li {
   font-size: 15px;
   font-weight: 400;
   color: var(--white);
-
   cursor: pointer;
   transition: 0.3s ease;
 }
@@ -48,28 +47,92 @@
 .login-btn {
   background: transparent;
   border: none;
-
   color: var(--white);
-
   font-size: 15px;
   font-weight: 600;
-
   cursor: pointer;
 }
 
+/* Hamburger button — hidden on desktop */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  z-index: 100;
+}
 
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--white);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform-origin: center;
+}
+
+/* Animate to X when open */
+.hamburger.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ── Mobile ── */
 @media (max-width: 768px) {
-
   .navbar {
-    padding: 20px;
+    padding: 20px 24px;
+    flex-wrap: wrap;
   }
 
-  .nav-links {
+  .hamburger {
+    display: flex;
+  }
+
+  /* Slide-down menu */
+  .navbar-links {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    order: 3; /* pushes below logo + hamburger row */
+
+    /* Hidden state */
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.3s ease, padding 0.3s ease;
+  }
+
+  .navbar-links.open {
+    max-height: 300px;
+    opacity: 1;
+    padding: 16px 0 8px;
+  }
+
+  .navbar-actions {
     display: none;
+    flex-direction: column;
+    width: 100%;
+    order: 4;
+    padding-bottom: 16px;
   }
 
-  .nav-buttons {
-    gap: 10px;
+  .navbar-actions.open {
+    display: flex;
   }
 
+  .navbar-actions .login-btn {
+    width: 100%;
+    text-align: left;
+  }
 }

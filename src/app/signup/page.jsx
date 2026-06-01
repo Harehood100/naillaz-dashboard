@@ -1,5 +1,6 @@
 "use client";
-
+import Link from "next/link";
+import api from "@/utils/api";
 import { useState } from "react";
 import "./signup.css";
 
@@ -21,7 +22,11 @@ const [password, setPassword] = useState("");
 const [confirmPassword, setConfirmPassword] = useState("");
 const [agreed, setAgreed] = useState(false);
 const [errors, setErrors] = useState({});
-  const handleSubmit = (e) => {
+
+const [serverError, setServerError] = useState("");
+const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
   e.preventDefault();
   let newErrors = {};
 
@@ -52,10 +57,49 @@ const [errors, setErrors] = useState({});
 
   setErrors(newErrors);
 
-  if (Object.keys(newErrors).length === 0) {
+  if (Object.keys(newErrors).length === 0) 
     window.location.href = "/verify";
+    {
+  setLoading(true);
+
+  try {
+    await api.post("/auth/signup", {
+      name: `${firstName?.trim() || ""} ${lastName?.trim() || ""}`.trim(),
+      email,
+      password,
+    });
+
+    router.push("/verify");
+  } catch (error) {
+    console.error("Signup error:", error);
+
+    const message =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Signup failed. Make sure your backend server is active.";
+
+    alert(message);
+  } finally {
+    setLoading(false);
   }
-};
+}
+  };
+
+
+      const getPasswordStrength = (password) => {
+      let score = 0;
+
+      if (password.length >= 8) score++;
+      if (/[A-Z]/.test(password)) score++;
+      if (/[0-9]/.test(password)) score++;
+      if (/[^A-Za-z0-9]/.test(password)) score++;
+
+      return score;
+    };
+
+   const strength = getPasswordStrength(password);
+
+
 
   return (
     <div className="signup-page">
@@ -163,12 +207,35 @@ const [errors, setErrors] = useState({});
             </div>
 
             <div className="password-strength">
-              <div className="red"></div>
-              <div className="yellow"></div>
-              <div className="green"></div>
-            </div>
+                <div
+                  className={`strength-bar ${
+                    strength >= 1 ? "strength-red" : ""
+                  }`}
+                ></div>
 
-            <small>Medium strength - add a symbol strengthen</small>
+                <div
+                  className={`strength-bar ${
+                    strength >= 2 ? "strength-yellow" : ""
+                  }`}
+                ></div>
+
+                <div
+                  className={`strength-bar ${
+                    strength >= 3 ? "strength-green" : ""
+                  }`}
+                ></div>
+              </div>
+
+           <small className="strength-text">
+          {strength <= 1 &&
+            "Weak password - add uppercase letters, numbers, or symbols"}
+
+          {strength === 2 &&
+            "Medium strength - add a symbol or number"}
+
+          {strength >= 3 &&
+            "Strong password"}
+        </small>
 
             <label>CONFIRM PASSWORD</label>
             <div className="input-wrapper">
@@ -202,7 +269,20 @@ const [errors, setErrors] = useState({});
               </p>
             </div>
 
-            <button type="submit" className="continue-btn">Continue</button>
+            {serverError && (
+              <p className="error-text">
+                {serverError}
+              </p>
+            )}
+
+           <button
+            type="submit"
+            className="continue-btn"
+            disabled={loading}
+          >
+            {loading ? "Creating Account..." : "Continue"}
+          </button>
+
 
             <div className="divider">
               <span></span>
@@ -210,18 +290,24 @@ const [errors, setErrors] = useState({});
               <span></span>
             </div>
 
-            <button className="google-btn">Sign up with Google</button>
+           <Link href="/auth/google">
+          <button type="button" className="google-btn">
+            Sign up with Google
+          </button>
+        </Link>
 
-            <div className="login-link">
-              Already have an account? <span>Log in</span>
-            </div>
-              
-            </form>  {/* ← ADD THIS */}
-            </div>  {/* this closes form-card */}
-          </div>
+           <div className="login-link">
+          Already have an account?{" "}
+          <Link href="/login">
+            <span>Log in</span>
+          </Link>
         </div>
+              
+            </form>  
+            </div>  
+          </div>
 
-      </div>{/* end .signup-content */}
+      </div> {/* end .signup-content */}
 
       <footer>
         ©2026 Naillaz Financial Corp. All rights reserved
