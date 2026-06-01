@@ -8,48 +8,26 @@ import {
 } from "lucide-react";
 
 export default function AuthInput({
-  label,
-  type,
-  placeholder,
-  icon,
-  password = false,
+  label, type, placeholder, icon, password = false,
+  value, onChange  // ← ADD THESE
 }) {
-  const [showPassword, setShowPassword] =
-    useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="form-group">
       {label && <label>{label}</label>}
-
       <div className="input-wrapper">
         {icon}
-
         <input
-          type={
-            password
-              ? showPassword
-                ? "text"
-                : "password"
-              : type
-          }
+          type={password ? (showPassword ? "text" : "password") : type}
           placeholder={placeholder}
+          value={value}        // ← ADD
+          onChange={onChange}  // ← ADD
         />
-
         {password && (
-          <button
-            type="button"
-            className="eye-btn"
-            onClick={() =>
-              setShowPassword(
-                !showPassword
-              )
-            }
-          >
-            {showPassword ? (
-              <EyeOff size={18} />
-            ) : (
-              <Eye size={18} />
-            )}
+          <button type="button" className="eye-btn"
+            onClick={() => setShowPassword(!showPassword)}>
+            {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
           </button>
         )}
       </div>
