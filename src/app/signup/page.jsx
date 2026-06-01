@@ -14,6 +14,48 @@ import AuthLogo from "../../components/auth/AuthLogo";
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [firstName, setFirstName] = useState("");
+const [lastName, setLastName] = useState("");
+const [email, setEmail] = useState("");
+const [password, setPassword] = useState("");
+const [confirmPassword, setConfirmPassword] = useState("");
+const [agreed, setAgreed] = useState(false);
+const [errors, setErrors] = useState({});
+  const handleSubmit = (e) => {
+  e.preventDefault();
+  let newErrors = {};
+
+  if (!firstName.trim()) newErrors.firstName = "First name is required";
+  if (!lastName.trim()) newErrors.lastName = "Last name is required";
+
+  if (!email.trim()) {
+    newErrors.email = "Email is required";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    newErrors.email = "Enter a valid email address";
+  }
+
+  if (!password) {
+    newErrors.password = "Password is required";
+  } else if (password.length < 8) {
+    newErrors.password = "Password must be at least 8 characters";
+  }
+
+  if (!confirmPassword) {
+    newErrors.confirmPassword = "Please confirm your password";
+  } else if (password !== confirmPassword) {
+    newErrors.confirmPassword = "Passwords do not match";
+  }
+
+  if (!agreed) {
+    newErrors.agreed = "You must agree to the terms";
+  }
+
+  setErrors(newErrors);
+
+  if (Object.keys(newErrors).length === 0) {
+    window.location.href = "/verify";
+  }
+};
 
   return (
     <div className="signup-page">
@@ -62,6 +104,7 @@ export default function SignupPage() {
         {/* RIGHT SECTION */}
         <div className="signup-right">
           <div className="form-card">
+            <form onSubmit={handleSubmit}> 
             <h1>Create Account</h1>
 
             <p>Set up your free Financial Workspace</p>
@@ -69,19 +112,35 @@ export default function SignupPage() {
             <div className="name-fields">
               <div>
                 <label>FIRST NAME</label>
-                <input type="text" />
+               <input
+                type="text"
+                 value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  />
+                {errors.firstName && <p className="error-text">{errors.firstName}</p>}
               </div>
 
               <div>
                 <label>LAST NAME</label>
-                <input type="text" />
+                <input
+                  type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                />
+                {errors.lastName && <p className="error-text">{errors.lastName}</p>}
               </div>
             </div>
 
             <label>BUSINESS EMAIL</label>
             <div className="input-wrapper">
               <Mail size={18} className="input-icon" />
-              <input type="email" placeholder="name@company.com" />
+              <input
+               type="email"
+               placeholder="name@company.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              />
+              {errors.email && <p className="error-text">{errors.email}</p>}
             </div>
 
             <label>PASSWORD</label>
@@ -90,7 +149,10 @@ export default function SignupPage() {
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
-              />
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                />
+              {errors.password && <p className="error-text">{errors.password}</p>}
               <button
                 type="button"
                 className="eye-btn"
@@ -113,8 +175,11 @@ export default function SignupPage() {
               <Lock size={18} className="input-icon" />
               <input
                 type={showConfirmPassword ? "text" : "password"}
-                placeholder="••••••••"
-              />
+                 placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              {errors.confirmPassword && <p className="error-text">{errors.confirmPassword}</p>}
               <button
                 type="button"
                 className="eye-btn"
@@ -125,14 +190,19 @@ export default function SignupPage() {
             </div>
 
             <div className="terms">
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                />
+              {errors.agreed && <p className="error-text">{errors.agreed}</p>}
               <p>
                 I agree to the <span>Terms of service</span>{" "}
                 and <span>Privacy Policy</span>
               </p>
             </div>
 
-            <button className="continue-btn">Continue</button>
+            <button type="submit" className="continue-btn">Continue</button>
 
             <div className="divider">
               <span></span>
@@ -145,6 +215,9 @@ export default function SignupPage() {
             <div className="login-link">
               Already have an account? <span>Log in</span>
             </div>
+              
+            </form>  {/* ← ADD THIS */}
+            </div>  {/* this closes form-card */}
           </div>
         </div>
 
