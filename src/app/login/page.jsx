@@ -90,7 +90,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               icon={<Mail size={18} className="input-icon" />}
-            />
+            
             {errors.email && <p className="error-text">{errors.email}</p>}
 
             <div className="password-row">
@@ -107,7 +107,7 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               icon={<Lock size={18} className="input-icon" />}
               password
-            />
+            
             {errors.password && <p className="error-text">{errors.password}</p>}
 
             {/* API-level error (wrong credentials, server down, etc.) */}
