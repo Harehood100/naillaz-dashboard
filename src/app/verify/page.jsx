@@ -32,9 +32,31 @@ useEffect(() => {
   "",
   "",
 ]);
+  const [error, setError] = useState("");
 
 const inputRefs = useRef([]);
 const userEmail = "alex-brown@company.com";
+
+const handleVerify = () => {
+  // Join all 6 digits into one string
+  const otpValue = otp.join("");
+
+  // Check if all 6 digits are filled
+  if (otpValue.length < 6) {
+    setError("Please enter the complete 6-digit code");
+    return;
+  }
+
+  // Check if any digit is empty
+  if (otp.includes("")) {
+    setError("Please fill in all 6 digits");
+    return;
+  }
+
+  // If valid — redirect to dashboard
+  console.log("OTP submitted:", otpValue);
+  window.location.href = "/dashboard";
+};
 
 const handleChange = (
   value,
@@ -109,19 +131,35 @@ const handleKeyDown = (
               />
             ))}
           </div>
+              {error && (
+              <p style={{
+              color: "red",
+              fontSize: "13px",
+              textAlign: "center",
+              marginBottom: "0.5rem"
+              }}>
+              {error}
+              </p>
+                )}
 
-          <button className="verify-btn">
+         <button className="verify-btn" onClick={handleVerify}>
             Verify
           </button>
 
-                  <button
-          className="resend-btn"
-          disabled={timer > 0}
-        >
-          {timer > 0
-            ? `Resend in ${timer}s`
-            : "Resend OTP"}
-        </button>
+                <button
+                className="resend-btn"
+                  disabled={timer > 0}
+                  onClick={() => {
+                  setTimer(30);  // reset timer back to 30
+                  setOtp(["","","","","",""]); // clear the OTP inputs
+                    setError(""); // clear any error
+                     console.log("OTP resent");
+                      }}
+                      >
+                  {timer > 0
+                  ? `Resend in ${timer}s`
+                  : "Resend OTP"}
+              </button>
         
         </AuthCard>
 
