@@ -13,26 +13,32 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+ const handleSubmit = (e) => {
+  e.preventDefault();
+  let newErrors = {};
 
-    let newErrors = {};
+  // Check email is not empty
+  if (!email.trim()) {
+    newErrors.email = "Email is required";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    // Check email format
+    newErrors.email = "Enter a valid email address";
+  }
 
-    if (!email.trim()) {
-      newErrors.email = "Email is required";
-    }
+  // Check password
+  if (!password.trim()) {
+    newErrors.password = "Password is required";
+  } else if (password.length < 8) {
+    newErrors.password = "Password must be at least 8 characters";
+  }
 
-    if (!password.trim()) {
-      newErrors.password = "Password is required";
-    }
+  setErrors(newErrors);
 
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      console.log("Login successful");
-    }
-  };
-
+  // If no errors — navigate to dashboard
+  if (Object.keys(newErrors).length === 0) {
+    window.location.href = "/dashboard"; // ← redirect
+  }
+};
   return (
     <div className="login-page">
       <div className="login-container">
