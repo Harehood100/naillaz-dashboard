@@ -2,88 +2,85 @@
 import Link from "next/link";
 import api from "@/utils/api";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import "./signup.css";
 
-import {
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import AuthLogo from "../../components/auth/AuthLogo";
 
 export default function SignupPage() {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [firstName, setFirstName] = useState("");
-const [lastName, setLastName] = useState("");
-const [email, setEmail] = useState("");
-const [password, setPassword] = useState("");
-const [confirmPassword, setConfirmPassword] = useState("");
-const [agreed, setAgreed] = useState(false);
-const [errors, setErrors] = useState({});
-
-const [serverError, setServerError] = useState("");
-const [loading, setLoading] = useState(false);
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [agreed, setAgreed] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  let newErrors = {};
+    e.preventDefault();
+    let newErrors = {};
 
-  if (!firstName.trim()) newErrors.firstName = "First name is required";
-  if (!lastName.trim()) newErrors.lastName = "Last name is required";
+    if (!firstName.trim()) newErrors.firstName = "First name is required";
+    if (!lastName.trim()) newErrors.lastName = "Last name is required";
 
-  if (!email.trim()) {
-    newErrors.email = "Email is required";
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    newErrors.email = "Enter a valid email address";
-  }
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Enter a valid email address";
+    }
 
-  if (!password) {
-    newErrors.password = "Password is required";
-  } else if (password.length < 8) {
-    newErrors.password = "Password must be at least 8 characters";
-  }
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    }
 
-  if (!confirmPassword) {
-    newErrors.confirmPassword = "Please confirm your password";
-  } else if (password !== confirmPassword) {
-    newErrors.confirmPassword = "Passwords do not match";
-  }
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password";
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
 
-  if (!agreed) {
-    newErrors.agreed = "You must agree to the terms";
-  }
+    if (!agreed) {
+      newErrors.agreed = "You must agree to the terms";
+    }
 
-  setErrors(newErrors);
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return; // ← stop here if validation fails
 
-  if (Object.keys(newErrors).length === 0) 
-    window.location.href = "/verify";
-    {
-  setLoading(true);
+    setLoading(true);
+    setServerError("");
 
-  try {
-    await api.post("/auth/signup", {
-      name: `${firstName?.trim() || ""} ${lastName?.trim() || ""}`.trim(),
-      email,
-      password,
-    });
+    try {
+      await api.post("/auth/signup", {
+        name: `${firstName.trim()} ${lastName.trim()}`.trim(),
+        email,
+        password,
+      });
 
-    router.push("/verify");
-  } catch (error) {
-    console.error("Signup error:", error);
-
-    const message =
-      error?.response?.data?.message ||
-      error?.message ||
-      "Signup failed. Make sure your backend server is active.";
-
-    alert(message);
-  } finally {
-    setLoading(false);
-  }
-}
+      // Store email for the verify page, then navigate
+      sessionStorage.setItem("pendingVerificationEmail", email);
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Signup error:", error);
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Signup failed. Make sure your backend server is active.";
+      setServerError(message);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  
 
 
       const getPasswordStrength = (password) => {

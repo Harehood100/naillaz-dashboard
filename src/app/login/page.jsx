@@ -22,7 +22,6 @@ export default function LoginPage() {
     e.preventDefault();
     setApiError("");
 
-    // --- Client-side validation ---
     let newErrors = {};
     if (!email.trim()) {
       newErrors.email = "Email is required";
@@ -38,32 +37,20 @@ export default function LoginPage() {
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
-    // --- API call ---
     try {
       setLoading(true);
-      const res = await api.post("/auth/login", {
-        email,
-        password
-      });
+      const res = await api.post("/auth/login", { email, password });
+      const data = res.data; // ✅ axios: no `await` needed, and it's res.data not res.data()
 
-      const data = await res.data;
-
-      if (!res.ok) {
-        // Server returned 4xx/5xx — show its message or a fallback
-        setApiError(data?.message ?? "Invalid email or password.");
-        return;
-      }
-
-      // ✅ Success — store token if JWT, then redirect
-      // If using sessions/cookies the backend sets them automatically, so just redirect.
       if (data.token) {
-        localStorage.setItem("token", data.token); // swap for httpOnly cookie if needed
+        localStorage.setItem("token", data.token);
       }
 
       router.push("/dashboard");
     } catch (err) {
-      // Network failure or JSON parse error
-      setApiError("Something went wrong. Please try again.");
+      // Axios throws on 4xx/5xx — extract message from response if available
+      const message = err.response?.data?.message ?? "Invalid email or password.";
+      setApiError(message);
     } finally {
       setLoading(false);
     }
@@ -90,7 +77,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               icon={<Mail size={18} className="input-icon" />}
-            
+            />  {/* ✅ closed */}
             {errors.email && <p className="error-text">{errors.email}</p>}
 
             <div className="password-row">
@@ -107,10 +94,9 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               icon={<Lock size={18} className="input-icon" />}
               password
-            
+            />  {/* ✅ closed */}
             {errors.password && <p className="error-text">{errors.password}</p>}
 
-            {/* API-level error (wrong credentials, server down, etc.) */}
             {apiError && <p className="error-text api-error">{apiError}</p>}
 
             <div className="remember-row">
