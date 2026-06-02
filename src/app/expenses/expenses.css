@@ -1,0 +1,120 @@
+.expenses-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.expenses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.expenses-header h2 {
+  font-size: 20px;
+  font-weight: 400;
+  color: #9ca3af;
+}
+
+.add-expense-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.add-expense-btn:hover { background: #dc2626; }
+
+.expenses-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.expense-stat-card {
+  background: #08162d;
+  border: 1px solid #1a2a45;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #9ca3af;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 6px;
+}
+
+.stat-change { font-size: 12px; color: #9ca3af; }
+.stat-change.negative { color: #ef4444; }
+.stat-change.positive { color: #22c55e; }
+
+.expenses-table-card {
+  background: #08162d;
+  border: 1px solid #1a2a45;
+  border-radius: 16px;
+  padding: 24px;
+  overflow-x: auto;
+}
+
+.expenses-table-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  text-align: left;
+  font-size: 12px;
+  color: #9ca3af;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 10px 12px;
+  border-bottom: 1px solid #1a2a45;
+}
+
+tbody td {
+  padding: 14px 12px;
+  font-size: 14px;
+  border-bottom: 1px solid #0d1f38;
+}
+
+tbody tr:hover { background: #0d1f38; }
+tbody tr:last-child td { border-bottom: none; }
+
+.category-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.amount-negative { color: #ef4444; font-weight: 600; }
+.amount-positive { color: #22c55e; font-weight: 600; }
+
+@media (max-width: 1200px) {
+  .expenses-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .expenses-stats { grid-template-columns: 1fr; }
+  .expenses-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .add-expense-btn { width: 100%; }
+}
