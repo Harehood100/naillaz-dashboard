@@ -6,6 +6,7 @@ import {
   Bell, Settings, Plus, Menu, X,
 } from "lucide-react";
 import Logo from "@/components/common/Logo";
+import NewTransactionModal from "@/components/transactions/NewTransactionModal";
 
 type SidebarProps = { activePage: string };
 
@@ -18,8 +19,12 @@ const navLinks = [
   { href: "/settings",      icon: Settings,         label: "Settings"      },
 ];
 
+
 export default function Sidebar({ activePage }: SidebarProps) {
   const [open, setOpen] = useState(false);
+
+  const [showTransactionModal, setShowTransactionModal] =
+  useState(false);
 
   return (
     <>
@@ -69,11 +74,23 @@ export default function Sidebar({ activePage }: SidebarProps) {
           </nav>
         </div>
 
-        <button className="new-transaction-btn">
+        <button 
+        className="new-transaction-btn"
+        onClick={() => setShowTransactionModal(true)}>
           <Plus size={18} />
           New Transaction
         </button>
+
+        
       </aside>
+
+      {showTransactionModal && (
+  <NewTransactionModal
+    onClose={() =>
+      setShowTransactionModal(false)
+    }
+  />
+)}
     </>
   );
 }
