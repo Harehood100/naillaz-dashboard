@@ -10,10 +10,7 @@ export default function IncomeChart() {
 
   useEffect(() => {
     if (!chartRef.current) return;
-
-    if (chartInstance.current) {
-      chartInstance.current.destroy();
-    }
+    if (chartInstance.current) chartInstance.current.destroy();
 
     chartInstance.current = new Chart(chartRef.current, {
       type: "bar",
@@ -22,24 +19,30 @@ export default function IncomeChart() {
         datasets: [{
           label: "Income",
           data: [18000, 22000, 19500, 25000, 21000, 28500],
-          backgroundColor: "rgba(34,197,94,0.7)",
+          backgroundColor: "rgba(29,110,250,0.7)",
           borderRadius: 8,
-          borderSkipped: false
-        }]
+          borderSkipped: false,
+        }],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            labels: { color: "#9ca3af", font: { size: 12 } }
-          }
+            labels: { color: "#9ca3af", font: { size: 12 } },
+          },
         },
         scales: {
           x: { ticks: { color: "#9ca3af" }, grid: { color: "rgba(255,255,255,0.04)" } },
-          y: { ticks: { color: "#9ca3af" }, grid: { color: "rgba(255,255,255,0.04)" } }
-        }
-      }
+          y: {
+            ticks: {
+              color: "#9ca3af",
+              callback: (v) => `$${Number(v).toLocaleString()}`,
+            },
+            grid: { color: "rgba(255,255,255,0.04)" },
+          },
+        },
+      },
     });
 
     return () => { chartInstance.current?.destroy(); };
