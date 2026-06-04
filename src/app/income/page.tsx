@@ -94,6 +94,7 @@ export default function IncomePage() {
 
       {isModalOpen && (
         <NewTransactionModal onClose={() => setIsModalOpen(false)} />
+        
       )}
     </>
   );

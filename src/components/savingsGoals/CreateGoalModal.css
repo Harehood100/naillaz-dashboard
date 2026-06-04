@@ -1,0 +1,302 @@
+.goal-modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.75);
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  padding: 24px;
+
+  overflow-y: auto;
+
+  z-index: 1000;
+}
+
+.goal-modal {
+  width: min(1100px, 95vw);
+
+  background: #07111f;
+
+  border: 1px solid #15263d;
+  border-radius: 16px;
+
+  padding: 20px 24px;
+
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  margin-bottom: 20px;
+}
+
+.goal-header h2 {
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.goal-header p {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  font-size: 20px;
+}
+
+.goal-close-btn {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  cursor: pointer;
+}
+
+.section-label {
+  display: block;
+
+  color: #94a3b8;
+  font-size: 0.8rem;
+  margin-bottom: 14px;
+  font-size: 16px;
+}
+
+.goal-types {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+
+  margin-bottom: 20px;
+}
+
+.goal-type-card {
+  height: 85px;
+
+  background: #081523;
+
+  border: 1px solid #1d3048;
+  border-radius: 8px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  gap: 6px;
+
+  color: white;
+  cursor: pointer;
+}
+
+.goal-type-card:hover {
+  border-color: #3b82f6;
+}
+
+.goal-type-card.active {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.goal-type-label {
+  font-size: 0.85rem;
+}
+
+.goal-icon {
+  font-size: 1rem;
+}
+
+.target-amount-card {
+  border: 1px solid #1d3048;
+  border-radius: 10px;
+
+  height: 150px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  margin-bottom: 24px;
+  font-size: 20px;
+}
+
+.target-amount-input {
+  background: transparent;
+  border: none;
+  outline: none;
+
+  color: white;
+
+  font-size: 2rem;
+  font-weight: 600;
+
+  text-align: center;
+
+  width: 100%;
+}
+
+.amount-input-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: white;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.target-amount-card span {
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+.target-amount-card h3 {
+  color: white;
+  font-size: 2.3rem;
+  font-weight: 600;
+}
+
+.goal-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 24px;
+
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  color: #d1d5db;
+
+  font-size: 0.85rem;
+
+  margin-bottom: 6px;
+  font-size: 16px;
+}
+
+.form-group input {
+  height: 42px;
+
+  background: transparent;
+  border: 1px solid #1d3048;
+  border-radius: 8px;
+
+  color: white;
+  padding: 0 14px;
+}
+
+.form-group input::placeholder {
+  color: #64748b;
+}
+
+.goal-estimate {
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #1d3048;
+  border-radius: 8px;
+
+  color: #22c55e;
+
+  font-size: 0.9rem;
+
+  margin-bottom: 20px;
+}
+
+
+.goal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cancel-btn {
+  width: 110px;
+  height: 40px;
+
+  background: transparent;
+  border: 1px solid #1d3048;
+  border-radius: 8px;
+
+  color: white;
+  cursor: pointer;
+}
+
+.create-goal-btn {
+  width: 165px;
+  height: 40px;
+
+  background: #2563eb;
+  border: none;
+  border-radius: 8px;
+
+  color: white;
+  cursor: pointer;
+}
+
+.create-goal-btn:hover {
+  background: #1d4ed8;
+}
+
+/* Tablet */
+
+@media (max-width: 900px) {
+  .goal-types {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 768px) {
+  .goal-modal {
+    padding: 18px;
+  }
+
+  .goal-header h2 {
+    font-size: 1.6rem;
+  }
+
+  .goal-types {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .goal-form-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .goal-footer {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .cancel-btn,
+  .create-goal-btn {
+    width: 100%;
+  }
+
+  .target-amount-card h3 {
+    font-size: 1.8rem;
+  }
+}
+
+/* Small Phones */
+
+@media (max-width: 480px) {
+  .goal-types {
+    grid-template-columns: 1fr;
+  }
+}

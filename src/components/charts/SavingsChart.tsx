@@ -38,7 +38,7 @@ export default function SavingsChart() {
               top: 20,
               right: 10,
               left: 0,
-              bottom: 0,
+              bottom: 9.5,
             }}>
               
             <CartesianGrid
@@ -50,6 +50,11 @@ export default function SavingsChart() {
               dataKey="month"
               tickLine={false}
               axisLine={false}
+
+              padding={{
+            left: 20,
+            right: 20,
+          }}
             />
 
             <YAxis
@@ -66,7 +71,7 @@ export default function SavingsChart() {
             <Bar
               dataKey="amount"
               radius={[4, 4, 0, 0]}
-              barSize={50}
+              barSize={40}
             >
               {data.map((entry, index) => (
                 <Cell

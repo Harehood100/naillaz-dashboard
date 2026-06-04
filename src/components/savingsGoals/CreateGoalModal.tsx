@@ -1,29 +1,51 @@
-// components/savings/CreateGoalModal.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
+import { X } from "lucide-react";
+import { createSavingsGoal } from "@/components/services/savingsService";
+import "./CreateGoalModal.css";
 
-interface CreateGoalModalProps {
+export type GoalFormData = {
+  goalType: string;
+  goalName: string;
+  targetAmount: number;
+  targetDate: string;
+  monthlyContribution: number;
+  linkedAccount: string;
+};
+
+type CreateGoalModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onCreateGoal: (goalData: GoalFormData) => void;
-}
+   onCreateGoal: (goal: GoalFormData & { id: string; createdAt: string }) => void;
+};
 
-export interface GoalFormData {
-  goalType: string;
-  targetAmount: number;
-  goalName: string;
-  monthlyContribution: number;
-  targetDate: string;
-  linkedAccount: string;
-}
-
-const GOAL_TYPES = [
-  { id: "Emergency Funds", label: "Emergency Funds", icon: "🛡️" },
-  { id: "Travel", label: "Travel", icon: "✈️" },
-  { id: "Business", label: "Business", icon: "💼" },
-  { id: "Tax Reserve", label: "Tax Reserve", icon: "📊" },
-  { id: "Custom", label: "Custom", icon: "⚙️" },
+const goalTypes = [
+  {
+    id: "emergency",
+    label: "Emergency Funds",
+    icon: "🏠",
+  },
+  {
+    id: "travel",
+    label: "Travel",
+    icon: "✈️",
+  },
+  {
+    id: "business",
+    label: "Business",
+    icon: "💳",
+  },
+  {
+    id: "tax",
+    label: "Tax Reserve",
+    icon: "💰",
+  },
+  {
+    id: "custom",
+    label: "Custom",
+    icon: "✨",
+  },
 ];
 
 export default function CreateGoalModal({
@@ -31,235 +53,221 @@ export default function CreateGoalModal({
   onClose,
   onCreateGoal,
 }: CreateGoalModalProps) {
-  const [formData, setFormData] = useState<GoalFormData>({
-    goalType: "Emergency Funds",
-    targetAmount: 5000,
-    goalName: "",
-    monthlyContribution: 500,
-    targetDate: "",
-    linkedAccount: "Chase***4412",
-  });
+  const [loading, setLoading] = useState(false);
+const [error, setError] = useState("");
 
-  const [monthsToGoal, setMonthsToGoal] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (formData.targetAmount > 0 && formData.monthlyContribution > 0) {
-      const months = Math.ceil(formData.targetAmount / formData.monthlyContribution);
-      setMonthsToGoal(months);
-    } else {
-      setMonthsToGoal(null);
-    }
-  }, [formData.targetAmount, formData.monthlyContribution]);
+  const [selectedGoal, setSelectedGoal] =
+    useState("emergency");
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        name === "targetAmount" || name === "monthlyContribution"
-          ? parseFloat(value) || 0
-          : value,
-    }));
-  };
+  const [goalName, setGoalName] =
+    useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onCreateGoal(formData);
-    onClose();
-    setFormData({
-      goalType: "Emergency Funds",
-      targetAmount: 5000,
-      goalName: "",
-      monthlyContribution: 500,
-      targetDate: "",
-      linkedAccount: "Chase***4412",
-    });
-  };
+  const [targetAmount, setTargetAmount] =
+    useState(5000);
 
-  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
+  const [targetDate, setTargetDate] =
+    useState("");
 
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        onClose();
-      }
-    };
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen, onClose]);
+  const [monthlyContribution, setMonthlyContribution] =
+    useState(500);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen]);
+  const [linkedAccount, setLinkedAccount] =
+    useState("");
 
   if (!isOpen) return null;
 
-  const isFormValid =
-    formData.targetAmount > 0 &&
-    formData.goalName.trim() !== "" &&
-    formData.monthlyContribution > 0 &&
-    formData.targetDate !== "";
+  const handleSubmit = async () => {
+  setLoading(true);
+  setError("");
+
+  try {
+    const newGoal = {
+      goalType: selectedGoal,
+      goalName,
+      targetAmount,
+      targetDate,
+      monthlyContribution,
+      linkedAccount,
+    };
+
+    const response = await createSavingsGoal(newGoal);
+
+    onCreateGoal(response); // backend response (important later)
+    onClose();
+  } catch (err: any) {
+    console.error(err);
+    setError(err.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
+
+  const monthsToGoal =
+    monthlyContribution > 0
+      ? Math.ceil(
+          targetAmount / monthlyContribution
+        )
+      : 0;
 
   return (
-    <div className="goal-modal-overlay" onClick={handleOverlayClick}>
-      <div className="goal-modal-container">
-        {/* Close Button */}
-        <button className="goal-modal-close" onClick={onClose}>
-          ✕
-        </button>
+    <div className="goal-modal-overlay">
+      <div className="goal-modal">
+        <div className="goal-header">
+          <div>
+            <h2>Create New Goal</h2>
+            <p>
+              Set a target and we'll help you
+              get there
+            </p>
+          </div>
 
-        {/* Header */}
-        <div className="goal-modal-header">
-          <h2 className="goal-modal-title">Create New Goal</h2>
-          <p className="goal-modal-subtitle">
-            Set a target and we&apos;ll help you get there
-          </p>
+          <button
+            className="goal-close-btn"
+            onClick={onClose}
+          >
+            <X size={18} />
+          </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="goal-modal-form">
-          {/* Goal Type Cards */}
-          <div className="goal-type-section">
-            <label className="goal-section-label">GOAL TYPE</label>
-            <div className="goal-type-grid">
-              {GOAL_TYPES.map((type) => (
-                <button
-                  key={type.id}
-                  type="button"
-                  onClick={() =>
-                    setFormData((prev) => ({ ...prev, goalType: type.id }))
-                  }
-                  className={`goal-type-card ${
-                    formData.goalType === type.id ? "active" : ""
-                  }`}
-                >
-                  <span className="goal-type-icon">{type.icon}</span>
-                  <span className="goal-type-label">{type.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+        <div className="goal-section">
+          <span className="section-label">
+            GOAL TYPE
+          </span>
 
-          {/* Target Amount Card */}
-          <div className="goal-amount-card">
-            <label className="goal-section-label">TARGET AMOUNT</label>
-            <div className="goal-amount-input-wrapper">
-              <span className="goal-currency-symbol">$</span>
-              <input
-                type="number"
-                name="targetAmount"
-                value={formData.targetAmount}
-                onChange={handleChange}
-                className="goal-amount-input"
-                step="100"
-                min="0"
-              />
-            </div>
-          </div>
+          <div className="goal-types">
+            {goalTypes.map((goal) => (
+              <button
+                key={goal.id}
+                type="button"
+                className={`goal-type-card ${
+                  selectedGoal === goal.id
+                    ? "active"
+                    : ""
+                }`}
+                onClick={() =>
+                  setSelectedGoal(goal.id)
+                }
+              >
+                <span className="goal-type-label">
+                  {goal.label}
+                </span>
 
-          {/* Goal Name Card */}
-          <div className="goal-input-card">
-            <label className="goal-section-label">GOAL NAME</label>
+                <span className="goal-icon">
+                  {goal.icon}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="target-amount-card">
+          <span>Target Amount</span>
+            <div
+                  className="amount-input-wrapper">
+          <span>$</span>
+
+          <input
+            type="number"
+            value={targetAmount}
+            onChange={(e) =>
+              setTargetAmount(Number(e.target.value))
+            }
+            className="target-amount-input"
+          />
+        </div>
+        </div>
+           
+
+        <div className="goal-form-grid">
+          <div className="form-group">
+            <label>Goal Name</label>
+
             <input
               type="text"
-              name="goalName"
-              value={formData.goalName}
-              onChange={handleChange}
-              placeholder="e.g. Emergency Funds"
-              className="goal-text-input"
+              value={goalName}
+              onChange={(e) =>
+                setGoalName(e.target.value)
+              }
+              placeholder="e.g Emergency Funds"
             />
           </div>
 
-          {/* Monthly Contribution Card */}
-          <div className="goal-input-card">
-            <label className="goal-section-label">MONTHLY CONTRIBUTION</label>
-            <div className="goal-amount-input-wrapper">
-              <span className="goal-currency-symbol">$</span>
-              <input
-                type="number"
-                name="monthlyContribution"
-                value={formData.monthlyContribution}
-                onChange={handleChange}
-                className="goal-amount-input"
-                step="50"
-                min="0"
-              />
-            </div>
-          </div>
+          <div className="form-group">
+            <label>Target Date</label>
 
-          {/* Target Date Card */}
-          <div className="goal-input-card">
-            <label className="goal-section-label">TARGET DATE</label>
             <input
               type="date"
-              name="targetDate"
-              value={formData.targetDate}
-              onChange={handleChange}
-              className="goal-date-input"
+              value={targetDate}
+              onChange={(e) =>
+                setTargetDate(e.target.value)
+              }
             />
           </div>
 
-          {/* Linked Account Card */}
-          <div className="goal-input-card">
-            <label className="goal-section-label">LINKED ACCOUNT</label>
-            <div className="goal-select-wrapper">
-              <select
-                name="linkedAccount"
-                value={formData.linkedAccount}
-                onChange={handleChange}
-                className="goal-select"
-              >
-                <option value="Chase***4412">Chase***4412</option>
-                <option value="Bank of America***7890">
-                  Bank of America***7890
-                </option>
-                <option value="Wells Fargo***1234">Wells Fargo***1234</option>
-              </select>
-              <span className="goal-select-arrow">▼</span>
-            </div>
+          <div className="form-group">
+            <label>
+              Monthly Contribution
+            </label>
+
+            <input
+              type="number"
+              value={monthlyContribution}
+              onChange={(e) =>
+                setMonthlyContribution(
+                  Number(e.target.value)
+                )
+              }
+              placeholder="$500"
+            />
           </div>
 
-          {/* Status Message */}
-          {monthsToGoal !== null &&
-            formData.monthlyContribution > 0 &&
-            formData.targetAmount > 0 && (
-              <div className="goal-status-card">
-                <span className="goal-status-icon">⚠️</span>
-                <span className="goal-status-text">
-                  At ${formData.monthlyContribution}/month you&apos;ll reach your
-                  goal in {monthsToGoal} month{monthsToGoal !== 1 ? "s" : ""}{" "}
-                  <span className="goal-status-badge">On Track</span>
-                </span>
-              </div>
-            )}
-        </form>
+          <div className="form-group">
+            <label>Linked Account</label>
 
-        {/* Footer Buttons */}
-        <div className="goal-modal-footer">
-          <button type="button" onClick={onClose} className="goal-btn-cancel">
+            <input
+              type="text"
+              value={linkedAccount}
+              onChange={(e) =>
+                setLinkedAccount(
+                  e.target.value
+                )
+              }
+              placeholder="Chase***4412"
+            />
+          </div>
+        </div>
+
+        <div className="goal-estimate">
+          💡 At $
+          {monthlyContribution.toLocaleString()}
+          /month you'll reach your goal in{" "}
+          {monthsToGoal} month
+          {monthsToGoal !== 1 ? "s" : ""}
+        </div>
+
+        <div className="goal-footer">
+          <button
+            className="cancel-btn"
+            onClick={onClose}
+          >
             Cancel
           </button>
+
+          
           <button
-            type="submit"
+            className="create-goal-btn"
             onClick={handleSubmit}
-            disabled={!isFormValid}
-            className={`goal-btn-create ${!isFormValid ? "disabled" : ""}`}
+            disabled={loading}
           >
-            <span className="goal-btn-plus">+</span>
-            Create Goal
+            {loading ? "Creating..." : "⊕ Create Goal"}
           </button>
+
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
         </div>
       </div>
     </div>

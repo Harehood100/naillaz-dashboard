@@ -1,39 +1,48 @@
 import GoalCard from "./GoalCard";
 
-export default function GoalsGrid() {
+type Goal = {
+  id: string;
+  goalName: string;
+  targetAmount: number;
+  targetDate: string;
+  saved?: number;
+};
+
+type Props = {
+  goals: Goal[];
+  loading?: boolean;
+};
+
+export default function GoalsGrid({ goals, loading }: Props) {
+  const skeletons = Array.from({ length: 4 });
+
   return (
     <div className="goals-grid">
-      <GoalCard
-        title="Emergency Fund"
-        percentage={65}
-        saved="$13,000"
-        target="$20,000"
-        completion="Aug 29, 2026"
-      />
-
-      <GoalCard
-        title="New Office"
-        percentage={12}
-        saved="$1,800"
-        target="$15,000"
-        completion="Nov 15, 2026"
-      />
-
-      <GoalCard
-        title="Tax Reserve"
-        percentage={88}
-        saved="$22,000"
-        target="$25,000"
-        completion="Jun 26, 2026"
-      />
-
-      <GoalCard
-        title="Employees Wages"
-        percentage={5}
-        saved="$2,000"
-        target="$30,000"
-        completion="Jan 12, 2027"
-      />
+      {loading
+        ? skeletons.map((_, i) => (
+            <div key={i} className="goal-card skeleton" />
+          ))
+        : goals.length === 0
+        ? (
+          <div className="goal-card empty-state-card">
+            <h3>No savings goals yet</h3>
+            <p>Create your first goal to start tracking progress.</p>
+          </div>
+        )
+        : goals.map((goal) => (
+            <GoalCard
+              key={goal.id}
+              title={goal.goalName}
+              saved={`$${goal.saved ?? 0}`}
+              target={`$${goal.targetAmount}`}
+              percentage={
+                goal.saved && goal.targetAmount
+                  ? Math.round((goal.saved / goal.targetAmount) * 100)
+                  : 0
+              }
+              completion={goal.targetDate}
+            />
+          ))}
     </div>
   );
 }

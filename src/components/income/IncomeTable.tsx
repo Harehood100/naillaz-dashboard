@@ -34,15 +34,17 @@ export default function IncomeTable() {
                   {income.source}
                 </span>
               </td>
-              <td className="tx-status">
-                {income.cleared
-                  ? <span className="status-dot cleared"></span>
-                  : <span className="status-ring"></span>
-                }
-                {income.cleared ? "Cleared" : "Pending"}
+              <td>
+                <div className="tx-status">
+                  {income.cleared
+                    ? <span className="status-dot cleared"></span>
+                    : <span className="status-ring"></span>
+                  }
+                  {income.cleared ? "Cleared" : "Pending"}
+                </div>
               </td>
               <td className="tx-amount">
-                # {income.amount.toLocaleString()}
+                ${income.amount.toLocaleString()}
               </td>
             </tr>
           ))}

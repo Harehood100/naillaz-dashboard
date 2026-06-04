@@ -127,8 +127,7 @@
 /* ─── Transactions Table Card ─────────────────────────── */
 .income-table-card {
   background: #0d1f3c;
-  border: 1.5px solid #1d6efa;
-  border-radius: 14px;
+  border-radius: 10px;
   padding: 24px;
   overflow-x: auto;
   margin-top: 26px;
@@ -142,14 +141,14 @@
 }
 
 .table-header-row h3 {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 600;
   color: #ffffff;
   margin: 0;
 }
 
 .view-all-link {
-  font-size: 13px;
+  font-size: 16px;
   color: #1d6efa;
   text-decoration: none;
   font-weight: 500;
@@ -162,95 +161,104 @@
 /* ─── Table ───────────────────────────────────────────── */
 .income-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0 10px;
   font-size: 16px;
   background: transparent;
 }
-
+ 
 .income-table thead,
 .income-table tbody,
 .income-table tr,
 .income-table th,
 .income-table td {
-  background: transparent;
   color: inherit;
 }
-
+ 
 .income-table thead th {
   text-align: left;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.08em;
+  background: #1a2e4a;
   color: #ffffff;
-  padding: 0 12px 12px 0;
+  padding: 10px 12px 12px 8px;
   border-bottom: 1px solid #1a2e4a;
   text-transform: uppercase;
 }
+ 
+.income-table tbody tr td {
+  background: #ffffff !important;
+  color: #0d1f3c;
+}
+ 
 
 .income-table tbody tr {
-  border-bottom:5px solid #1e3a5f;
+  border-bottom: 10px solid transparent;
 }
-
+ 
 .income-table tbody tr:last-child {
   border-bottom: none;
 }
-
+ 
 .income-table tbody td {
-  padding: 14px 12px 14px 0;
+  padding: 14px 12px 14px 8px;
   vertical-align: middle;
-  background: transparent;
 }
-
+ 
 .tx-date {
-  color: black;
-  font-size: 13px;
+  color: #4a5f80;
+  font-size: 16px;
   white-space: nowrap;
 }
-
+ 
 .tx-desc {
-  color: #000;
-  font-weight: 500;
+  color: #0d1f3c;
+  font-weight: 600;
+  font-size: 16px;
 }
-
+ 
 .tx-amount {
-  color: #000;
+  color: #0d1f3c;
   font-weight: 600;
   text-align: right;
   white-space: nowrap;
+  font-size: 16px;
 }
-
+ 
 /* ─── Category Badges ─────────────────────────────────── */
 .category-badge {
   display: inline-block;
-  border-radius: 6px;
-  padding: 3px 10px;
+  border-radius: 3px;
+  padding: 8px 10px;
   font-size: 13px;
   font-weight: 600;
 }
-
-.category-services   { background: #0d3050; color: #60a5fa; }
-.category-sales      { background: #1a3520; color: #4ade80; }
-.category-investment { background: #7c4a00; color: #fbbf24; text-transform: uppercase; font-size: 10px; letter-spacing: 0.04em; }
-
+ 
+.category-services   { background: #2D6BE433; color: #60a5fa; }
+.category-sales      { background: #22C55E33; color: #4ade80; }
+.category-investment { background: #F59E0B66; color: #fbbf24; text-transform: uppercase; font-size: 13px; letter-spacing: 0.04em; }
+ 
 /* ─── Status ──────────────────────────────────────────── */
 .tx-status {
-  color: #94a3b8;
+  color: #4a5f80;
   display: flex;
   align-items: center;
   gap: 6px;
   white-space: nowrap;
+  font-size: 16px;
 }
-
+ 
 .status-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
 }
-
+ 
 .status-dot.cleared { background: #22c55e; }
 .status-dot.pending { background: #f97316; }
-
+ 
 .status-ring {
   width: 7px;
   height: 7px;
@@ -259,6 +267,7 @@
   flex-shrink: 0;
   background: transparent;
 }
+ 
 
 /* ─── Revenue Mix + Insight Row ───────────────────────── */
 .revenue-row {
