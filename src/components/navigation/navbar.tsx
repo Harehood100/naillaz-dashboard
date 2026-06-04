@@ -1,5 +1,6 @@
 "use client";
 import "./navbar.css";
+import Link from "next/link";
 import Logo from "@/components/common/Logo";
 import Button from "../UI/button";
 import { useState } from "react";
@@ -21,8 +22,15 @@ export default function Navbar() {
       </ul>
 
       <div className={`navbar-actions ${menuOpen ? "open" : ""}`}>
-        <button className="login-btn">Log In</button>
+        <Link href="/login">
+          <button className="login-btn">
+            Log In
+          </button>
+        </Link>
+        
+        <Link href="/signup">
         <Button text="Sign Up" />
+      </Link>
       </div>
 
       <button

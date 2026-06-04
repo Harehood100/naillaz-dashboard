@@ -111,16 +111,23 @@ export default function SignupPage() {
           </div>
 
           <div className="left-content">
-            <h1>Start managing your money with clarity.</h1>
+            <h1>Your money {" "}
+               <span style={{ color: "#f5a017" }}>
+                tracked & grown
+               </span>{" "}
+              
+               with clarity.
 
+            </h1>
+            
             <p>
               Join over 2,500 businesses. Setup takes less than 2 minutes.
             </p>
 
             <ul>
-              <li>14-day free trial, no card required</li>
-              <li>Unlimited transaction tracking</li>
-              <li>Cancel anytime</li>
+              <li>•14-day free trial, no card required</li>
+              <li>•Unlimited transaction tracking</li>
+              <li>•Cancel anytime</li>
             </ul>
 
             <div className="stats">

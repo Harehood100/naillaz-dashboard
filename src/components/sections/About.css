@@ -55,7 +55,7 @@
 
 .about-row-one .btn {
   width: 138px;
-  height: 33px;
+  height: 40px;
 
   border-radius: 8px;
 
@@ -96,7 +96,7 @@
 }
 
 .about-row-one h2 span {
-  color: var(--primary);
+  color: #f5b114;
 }
 
 .about-row-two {

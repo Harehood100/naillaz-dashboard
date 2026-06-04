@@ -1,5 +1,5 @@
 import "./About.css";
-import Navbar from "../navigation/navbar";
+import Link from "next/link";
 import Button from "../UI/button";
 import Image from "next/image";
 import Footer from "../layout/Footer";
@@ -8,7 +8,6 @@ export default function About() {
   return (
     <section className="about">
 
-      <Navbar />
 
       <div className="about-divider"></div>
 
@@ -36,8 +35,9 @@ export default function About() {
           A unified workspace for tracking revenues,managing expenses, and securing your company’s financial future without the complexity.
         </p>
 
+        <Link href="/signup">
         <Button text="Get Started" />
-
+      </Link>
       </div>
 
 
@@ -115,8 +115,9 @@ export default function About() {
       Join  over 2,500 businesses using Naillaz to streamline their financial architecture. No credit card required to start your 14-day trial.
     </p>
 
-    <Button text="Start Your Free Trial" />
-
+    <Link href="/signup">
+      <Button text="Start Free Trial" />
+    </Link>
   </div>
 
 </div>

@@ -1,14 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import IncomeTable from "@/components/income/IncomeTable";
-import NewTransactionModal from "@/components/transactions/NewTransactionModal";
+import NewTransactionModal, { TransactionData } from "@/components/transactions/NewTransactionModal";
 import RevenueMixChart from "@/components/income/RevenueMixChart";
 import "./income.css";
+import {  getTransactions } from "@/components/services/transactionService";
 
 export default function IncomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [transactions, setTransactions] = useState<TransactionData[]>([]);
+
+  useEffect(() => {
+  const loadTransactions = async () => {
+    try {
+      const data = await getTransactions(); // from your transactionService
+      setTransactions(data.transactions); // adjust based on actual response structure
+    } catch (error) {
+      console.error("Failed to fetch transactions:", error);
+    }
+  };
+
+  loadTransactions();
+}, []);
+
+  const handleTransactionCreated = (newTransaction: TransactionData) => {
+  setTransactions((prev) => [newTransaction, ...prev]);
+};
+
+const incomeTransactions = transactions.filter(
+  (t) => t.type === "income"
+);
 
   return (
     <>
@@ -52,7 +75,7 @@ export default function IncomePage() {
           </div>
 
           {/* Recent Transactions */}
-          <IncomeTable />
+          <IncomeTable transactions={incomeTransactions} />
 
           {/* Revenue Mix + Smart Insight */}
           <div className="revenue-row">
@@ -93,7 +116,11 @@ export default function IncomePage() {
       </AppLayout>
 
       {isModalOpen && (
-        <NewTransactionModal onClose={() => setIsModalOpen(false)} />
+       <NewTransactionModal
+        onClose={() => setIsModalOpen(false)}
+        onTransactionCreated={handleTransactionCreated}
+        defaultType="income"
+      />
         
       )}
     </>

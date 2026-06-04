@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
-import NewTransactionModal from "@/components/transactions/NewTransactionModal";
+import NewTransactionModal, { TransactionData } from "@/components/transactions/NewTransactionModal";
 import "./expenses.css";
+import { getTransactions } from "@/components/services/transactionService";
 
 const recentExpenses = [
   { icon: "🍽️", name: "The Bistro Downtown", date: "TODAY, 7:30AM", amount: -18000, color: "#e74c3c" },
@@ -19,6 +20,24 @@ const recentExpenses = [
 
 export default function ExpensesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [transactions, setTransactions] = useState<TransactionData[]>([]);
+
+  useEffect(() => {
+  const loadTransactions = async () => {
+    const data = await getTransactions(); // from your service
+    setTransactions(data);
+  };
+
+  loadTransactions();
+}, []);
+
+const handleTransactionCreated = (newTransaction: TransactionData) => {
+  setTransactions((prev) => [newTransaction, ...prev]);
+};
+
+const expenseTransactions = transactions.filter(
+  (t) => t.type === "expense"
+);
 
   return (
     <>
@@ -146,7 +165,13 @@ export default function ExpensesPage() {
         </div>
       </AppLayout>
 
-      {isModalOpen && <NewTransactionModal onClose={() => setIsModalOpen(false)} />}
+      {isModalOpen && 
+      <NewTransactionModal
+  onClose={() => setIsModalOpen(false)}
+  onTransactionCreated={handleTransactionCreated}
+  defaultType="expense"
+/>
+}
     </>
   );
 }

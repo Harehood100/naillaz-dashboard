@@ -86,9 +86,7 @@ export default function Sidebar({ activePage }: SidebarProps) {
 
       {showTransactionModal && (
   <NewTransactionModal
-    onClose={() =>
-      setShowTransactionModal(false)
-    }
+    onClose={() => setShowTransactionModal(false)}
   />
 )}
     </>

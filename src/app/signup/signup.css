@@ -71,6 +71,13 @@
   line-height: 1.2;
 }
 
+.left-content span {
+  color: #f5b114;
+  font-size: 3rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
 .left-content p {
   color: #c8d0e0;
   margin-bottom: 25px;

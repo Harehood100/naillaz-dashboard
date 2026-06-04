@@ -1,3 +1,5 @@
+import { TransactionData } from "../transactions/NewTransactionModal";
+
 const incomes = [
   { id: 1, description: "Stellar Tech Solutions",  source: "Services",    sourceType: "services",   date: "May 1, 2026",  amount: 30000,  cleared: true  },
   { id: 2, description: "Direct Sales - POS",       source: "Sales",       sourceType: "sales",      date: "May 5, 2026",  amount: 50000,  cleared: true  },
@@ -7,7 +9,11 @@ const incomes = [
   { id: 6, description: "Direct Sales - POS",       source: "Sales",       sourceType: "sales",      date: "May 18, 2026", amount: 100000, cleared: true  },
 ];
 
-export default function IncomeTable() {
+interface Props {
+  transactions: TransactionData[];
+}
+
+export default function IncomeTable({ transactions }: Props) {
   return (
     <div className="income-table-card">
       <div className="table-header-row">
