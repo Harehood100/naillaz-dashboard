@@ -59,7 +59,7 @@ export default function SignupPage() {
     setServerError("");
 
     try {
-      await api.post("/auth/signup", {
+     await api.post("/api/auth/sign-up", {
         name: `${firstName.trim()} ${lastName.trim()}`.trim(),
         email,
         password,
