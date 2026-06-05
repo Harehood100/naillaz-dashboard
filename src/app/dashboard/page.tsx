@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import NewTransactionModal from "@/components/transactions/NewTransactionModal";
+import { getTransactions } from "@/components/services/transactionService";
 import "./dashboard.css";
 
-const transactions = [
+const fallbackTransactions = [
   { id: 1, icon: "🖥️", name: "Amazon Web Service", date: "YESTERDAY, 2:00PM", amount: -156.00 },
   { id: 2, icon: "🍽️", name: "The Bistro Downtown", date: "TODAY, 7:50AM", amount: -42.50 },
   { id: 3, icon: "🖨️", name: "Direct Sales - POS", date: "MAY 5, 2:00PM", amount: 3150.25 },
@@ -24,7 +25,26 @@ export default function DashboardPage() {
   const [period, setPeriod] = useState<"weekly" | "monthly">("weekly");
   const [isModalOpen, setIsModalOpen] = useState(false);
 const [modalType, setModalType] = useState<"income" | "expense">("income");
-  const data = period === "weekly" ? weeklyData : monthlyData;
+    const [transactions, setTransactions] = useState(fallbackTransactions);
+const [loadingData, setLoadingData] = useState(true);
+  useEffect(() => {
+  const fetchTransactions = async () => {
+    try {
+      const data = await getTransactions();
+      if (data && data.length > 0) {
+        setTransactions(data);
+      }
+    } catch (err) {
+      console.error("Using fallback transactions:", err);
+      // fallback data stays — no need to do anything
+    } finally {
+      setLoadingData(false);
+    }
+  };
+  fetchTransactions();
+}, []);
+
+const data = period === "weekly" ? weeklyData : monthlyData;
   const maxVal = Math.max(...data);
 
   return (
@@ -188,12 +208,21 @@ const [modalType, setModalType] = useState<"income" | "expense">("income");
       </div>
    </AppLayout>
 
-      {isModalOpen && (
-        <NewTransactionModal
-          onClose={() => setIsModalOpen(false)}
-          type={modalType}
-        />
-      )}
+     {isModalOpen && (
+  <NewTransactionModal
+    onClose={() => setIsModalOpen(false)}
+    type={modalType}
+    onTransactionCreated={async () => {
+      try {
+        const updated = await getTransactions();
+        if (updated && updated.length > 0) setTransactions(updated);
+      } catch (err) {
+        console.error("Could not refresh transactions:", err);
+      }
+      setIsModalOpen(false);
+    }}
+  />
+)}
     </>
   );
 }
