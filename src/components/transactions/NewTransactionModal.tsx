@@ -19,17 +19,23 @@ export type TransactionData = {
 
 interface NewTransactionModalProps {
   onClose: () => void;
-  onTransactionCreated?: (transaction: any) => void;
+  onTransactionCreated?: (
+    transaction: TransactionData
+  ) => void;
   defaultType?: "expense" | "income" | "transfer";
+  type?: "expense" | "income" | "transfer";
 }
-
+  
 
 export default function NewTransactionModal({
   onClose,
   onTransactionCreated,
   defaultType = "expense",
+  type,
 }: NewTransactionModalProps) {
-  const [transactionType, setTransactionType] = useState(defaultType);
+  const [transactionType, setTransactionType] =
+    useState(defaultType);
+
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("Dining & Food");
   const [date, setDate] = useState("");
