@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
+import NewTransactionModal from "@/components/transactions/NewTransactionModal";
 import "./dashboard.css";
 
 const transactions = [
@@ -21,10 +22,13 @@ const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN"];
 
 export default function DashboardPage() {
   const [period, setPeriod] = useState<"weekly" | "monthly">("weekly");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+const [modalType, setModalType] = useState<"income" | "expense">("income");
   const data = period === "weekly" ? weeklyData : monthlyData;
   const maxVal = Math.max(...data);
 
   return (
+  <>
     <AppLayout title="Dashboard" activePage="dashboard">
       <div className="dash-content">
 
@@ -118,14 +122,26 @@ export default function DashboardPage() {
           <div className="dash-card quick-actions-card">
             <h3 className="quick-actions-title">Quick Actions</h3>
             <div className="quick-actions-grid">
-              <button className="quick-action-btn">
-                <span className="quick-action-icon">⊕</span>
-                Add Income
-              </button>
-              <button className="quick-action-btn quick-action-btn--expense">
-                <span className="quick-action-icon">⊖</span>
-                Add Expenses
-              </button>
+              <button
+  className="quick-action-btn"
+  onClick={() => {
+    setModalType("income");
+    setIsModalOpen(true);
+  }}
+>
+  <span className="quick-action-icon">⊕</span>
+  Add Income
+</button>
+<button
+  className="quick-action-btn quick-action-btn--expense"
+  onClick={() => {
+    setModalType("expense");
+    setIsModalOpen(true);
+  }}
+>
+  <span className="quick-action-icon">⊖</span>
+  Add Expenses
+</button>
             </div>
           </div>
 
@@ -170,6 +186,14 @@ export default function DashboardPage() {
         </div>
 
       </div>
-    </AppLayout>
+   </AppLayout>
+
+      {isModalOpen && (
+        <NewTransactionModal
+          onClose={() => setIsModalOpen(false)}
+          type={modalType}
+        />
+      )}
+    </>
   );
 }
