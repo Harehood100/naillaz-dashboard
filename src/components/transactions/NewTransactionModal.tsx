@@ -4,7 +4,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import "./NewTransactionModal.css";
 import {
-  createTransaction,
+  createExpense,
 } from "@/components/services/transactionService";
 
 export type TransactionData = {
@@ -19,13 +19,51 @@ export type TransactionData = {
 
 interface NewTransactionModalProps {
   onClose: () => void;
-  onTransactionCreated?: (
-    transaction: TransactionData
-  ) => void;
+  onTransactionCreated?: (transaction: TransactionData) => void;
   defaultType?: "expense" | "income" | "transfer";
   type?: "expense" | "income" | "transfer";
 }
-  
+
+// ─── Category options per transaction type ────────────────────────────────────
+// Expense categories match CATEGORY_COLORS in ExpensesPage exactly.
+// Income categories are common income sources.
+
+const EXPENSE_CATEGORIES = [
+  "Food",
+  "Rent",
+  "Transport",
+  "Utilities",
+  "Entertainment",
+  "Health",
+  "Shopping",
+  "Education",
+  "Other",
+];
+
+const INCOME_CATEGORIES = [
+  "Salary",
+  "Freelance",
+  "Business",
+  "Investment",
+  "Gift",
+  "Refund",
+  "Other",
+];
+
+const TRANSFER_CATEGORIES = [
+  "Bank Transfer",
+  "Savings",
+  "Investment",
+  "Other",
+];
+
+function getCategoriesForType(type: string) {
+  if (type === "income") return INCOME_CATEGORIES;
+  if (type === "transfer") return TRANSFER_CATEGORIES;
+  return EXPENSE_CATEGORIES; // default: expense
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function NewTransactionModal({
   onClose,
@@ -33,50 +71,69 @@ export default function NewTransactionModal({
   defaultType = "expense",
   type,
 }: NewTransactionModalProps) {
-  const [transactionType, setTransactionType] =
-    useState(defaultType);
+  const [transactionType, setTransactionType] = useState(
+    type ?? defaultType
+  );
 
   const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("Dining & Food");
-  const [date, setDate] = useState("");
+  const [category, setCategory] = useState(
+    getCategoriesForType(type ?? defaultType)[0]
+  );
+  const [date, setDate] = useState(
+    // Default to today's date
+    new Date().toISOString().split("T")[0]
+  );
   const [description, setDescription] = useState("");
   const [account, setAccount] = useState("Main Account");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // When the user switches tabs, reset category to the first option for that type
+  const handleTypeChange = (newType: "expense" | "income" | "transfer") => {
+    setTransactionType(newType);
+    setCategory(getCategoriesForType(newType)[0]);
+    setError("");
+  };
+
   const handleSave = async () => {
     setError("");
 
+    // ── Validation ──
     if (!amount || Number(amount) <= 0) {
       setError("Please enter a valid amount.");
       return;
     }
-
     if (!description.trim()) {
       setError("Please add a description.");
+      return;
+    }
+    if (!date) {
+      setError("Please select a date.");
       return;
     }
 
     try {
       setLoading(true);
 
-      // ✅ IMPORTANT: matches backend exactly
       const payload = {
         type: transactionType,
         category,
         description,
         account,
         amount: Number(amount),
+        date,           // ← previously missing; required for weekly trend chart
         status: "Cleared",
       };
 
-      const res = await createTransaction(payload); 
+      // All types go through createExpense (POST /expenses/add)
+      // so every transaction is fetchable via getTransactions (GET /expenses)
+      const res = await createExpense(payload);
 
-      console.log("Transaction created:", res);
+      // Normalise: some backends wrap the record in { data: {...} }
+      const saved: TransactionData = res?.data ?? res;
 
-      onTransactionCreated?.(res?.data ?? res);
-
+      onTransactionCreated?.(saved);
       onClose();
     } catch (err: any) {
       console.error("Transaction error:", err);
@@ -92,85 +149,51 @@ export default function NewTransactionModal({
     }
   };
 
+  const categories = getCategoriesForType(transactionType);
+
   return (
-    <div
-      className="transaction-modal-overlay"
-      onClick={onClose}
-    >
+    <div className="transaction-modal-overlay" onClick={onClose}>
       <div
         className="transaction-modal"
-        onClick={(e) =>
-          e.stopPropagation()
-        }
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="transaction-modal-scroll">
-          {/* Header */}
+          {/* ── Header ── */}
           <div className="transaction-modal-header">
             <h2>New Transaction</h2>
-
-            <button
-              className="close-btn"
-              onClick={onClose}
-            >
+            <button className="close-btn" onClick={onClose}>
               <X size={20} />
             </button>
           </div>
 
-          {/* Tabs */}
-          <div className="transaction-tabs">
-            <button
-              className={
-                transactionType ===
-                "expense"
-                  ? "active"
-                  : ""
-              }
-              onClick={() =>
-                setTransactionType(
-                  "expense"
-                )
-              }
-            >
-              💸 Expense
-            </button>
+          {/* ── Tabs ── */}
+          {/* Hide tabs when the parent locks the type via the `type` prop */}
+          {!type && (
+            <div className="transaction-tabs">
+              <button
+                className={transactionType === "expense" ? "active" : ""}
+                onClick={() => handleTypeChange("expense")}
+              >
+                💸 Expense
+              </button>
+              <button
+                className={transactionType === "income" ? "active" : ""}
+                onClick={() => handleTypeChange("income")}
+              >
+                💰 Income
+              </button>
+              <button
+                className={transactionType === "transfer" ? "active" : ""}
+                onClick={() => handleTypeChange("transfer")}
+              >
+                ⇄ Transfer
+              </button>
+            </div>
+          )}
 
-            <button
-              className={
-                transactionType ===
-                "income"
-                  ? "active"
-                  : ""
-              }
-              onClick={() =>
-                setTransactionType(
-                  "income"
-                )
-              }
-            >
-              💰 Income
-            </button>
-
-            <button
-              className={
-                transactionType ===
-                "transfer"
-                  ? "active"
-                  : ""
-              }
-              onClick={() =>
-                setTransactionType(
-                  "transfer"
-                )
-              }
-            >
-              ⇄ Transfer
-            </button>
-          </div>
-
-          {/* Amount */}
+          {/* ── Amount ── */}
           <div className="amount-card">
             <span>Amount</span>
-
             <input
               className="amount-input"
               type="number"
@@ -178,114 +201,63 @@ export default function NewTransactionModal({
               step="0.01"
               placeholder="0.00"
               value={amount}
-              onChange={(e) =>
-                setAmount(
-                  e.target.value
-                )
-              }
+              onChange={(e) => setAmount(e.target.value)}
             />
           </div>
 
-          {/* Form */}
+          {/* ── Form ── */}
           <div className="transaction-form">
             <div className="form-row">
+              {/* Category — options change based on transaction type */}
               <div className="form-group">
-                <label>
-                  Category
-                </label>
-
+                <label>Category</label>
                 <select
                   value={category}
-                  onChange={(e) =>
-                    setCategory(
-                      e.target.value
-                    )
-                  }
+                  onChange={(e) => setCategory(e.target.value)}
                 >
-                  <option>
-                    Dining & Food
-                  </option>
-                  <option>
-                    Transport
-                  </option>
-                  <option>
-                    Shopping
-                  </option>
-                  <option>
-                    Entertainment
-                  </option>
-                  <option>
-                    Health
-                  </option>
-                  <option>
-                    Utilities
-                  </option>
-                  <option>
-                    Housing
-                  </option>
-                  <option>
-                    Other
-                  </option>
+                  {categories.map((cat) => (
+                    <option key={cat}>{cat}</option>
+                  ))}
                 </select>
               </div>
 
+              {/* Date — now included in payload */}
               <div className="form-group">
                 <label>Date</label>
-
                 <input
                   type="date"
                   value={date}
-                  onChange={(e) =>
-                    setDate(
-                      e.target.value
-                    )
-                  }
+                  onChange={(e) => setDate(e.target.value)}
                 />
               </div>
             </div>
 
             <div className="form-group">
-              <label>
-                Description
-              </label>
-
+              <label>Description</label>
               <input
                 type="text"
                 placeholder="What was this for?"
                 value={description}
-                onChange={(e) =>
-                  setDescription(
-                    e.target.value
-                  )
-                }
+                onChange={(e) => setDescription(e.target.value)}
               />
             </div>
 
             <div className="form-group">
-              <label>
-                Account
-              </label>
-
+              <label>Account</label>
               <input
                 type="text"
                 value={account}
-                onChange={(e) =>
-                  setAccount(
-                    e.target.value
-                  )
-                }
+                onChange={(e) => setAccount(e.target.value)}
               />
             </div>
           </div>
 
           {error && (
-            <div className="transaction-error">
-              {error}
-            </div>
+            <div className="transaction-error">{error}</div>
           )}
         </div>
 
-        {/* Footer */}
+        {/* ── Footer ── */}
         <div className="transaction-modal-footer">
           <button
             className="cancel-btn"
@@ -294,15 +266,12 @@ export default function NewTransactionModal({
           >
             Cancel
           </button>
-
           <button
             className="save-btn"
             onClick={handleSave}
             disabled={loading}
           >
-            {loading
-              ? "Saving..."
-              : "Save Transaction"}
+            {loading ? "Saving..." : "Save Transaction"}
           </button>
         </div>
       </div>

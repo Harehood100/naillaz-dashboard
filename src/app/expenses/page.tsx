@@ -7,7 +7,7 @@ import NewTransactionModal, {
 } from "@/components/transactions/NewTransactionModal";
 import "./expenses.css";
 
-import { getTransactions } from "@/components/services/transactionService";
+import { getTransactions, createExpense } from "@/components/services/transactionService";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -41,10 +41,6 @@ function colorFor(category: string) {
   return CATEGORY_COLORS[category] ?? CATEGORY_COLORS["Other"];
 }
 
-/**
- * Split the current month's expenses into 4 roughly-equal weekly buckets
- * based on the transaction date.
- */
 function buildWeeklyTotals(transactions: TransactionData[]): number[] {
   const now = new Date();
   const year = now.getFullYear();
@@ -53,7 +49,7 @@ function buildWeeklyTotals(transactions: TransactionData[]): number[] {
   const weekly = [0, 0, 0, 0];
 
   transactions.forEach((t) => {
-    const d = new Date(t.date ?? "");
+    const d = new Date((t as any).date ?? (t as any).createdAt ?? "");
     if (isNaN(d.getTime())) return;
     if (d.getFullYear() !== year || d.getMonth() !== month) return;
     const day = d.getDate();
@@ -79,7 +75,7 @@ function PieChart({ categories }: { categories: CategoryStat[] }) {
     );
   }
 
-  let cumulativeAngle = -Math.PI / 2; // start at 12 o'clock
+  let cumulativeAngle = -Math.PI / 2;
   const cx = 18;
   const cy = 18;
   const r = 15;
@@ -120,14 +116,13 @@ export default function ExpensesPage() {
   const [allTransactions, setAllTransactions] = useState<TransactionData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ── Fetch all transactions on mount (and after auth restores the token) ──
+  // ── Fetch on mount ──
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
         const data = await getTransactions();
 
-        // Normalise: backend may return { data: [...] } or plain array
         const list: TransactionData[] = Array.isArray(data?.data)
           ? data.data
           : Array.isArray(data)
@@ -151,9 +146,9 @@ export default function ExpensesPage() {
     setAllTransactions((prev) => [newTransaction, ...prev]);
   };
 
-  // ── Derive expense-only list ──
+  // ── Filter to expenses only — excludes income and transfer entries ──
   const expenseTransactions = useMemo(
-    () => allTransactions.filter((t) => t?.type === "expense"),
+    () => allTransactions.filter((t) => t.type === "expense"),
     [allTransactions]
   );
 
@@ -185,10 +180,9 @@ export default function ExpensesPage() {
     [expenseTransactions]
   );
   const maxWeekly = Math.max(...weeklyTotals, 1);
-  // Scale bars to max 90px height
   const barHeights = weeklyTotals.map((v) => Math.round((v / maxWeekly) * 90));
 
-  // ── Spending limits (derived per category) ──
+  // ── Spending limits ──
   const LIMITS: { name: string; limit: number }[] = [
     { name: "Food", limit: 80_000 },
     { name: "Rent", limit: 150_000 },
@@ -202,7 +196,7 @@ export default function ExpensesPage() {
     const pct = Math.min((spent / limit) * 100, 100);
     const status = pct >= 90 ? "danger" : pct >= 70 ? "warning" : "safe";
     return { name, spent, limit, pct, status };
-  }).filter(({ spent }) => spent > 0); // only show categories that have spending
+  }).filter(({ spent }) => spent > 0);
 
   // ─────────────────────────────────────────────────────────────────────────────
 
@@ -263,8 +257,8 @@ export default function ExpensesPage() {
                     {expenseTransactions.length === 0 ? (
                       <p className="re-empty">No expenses recorded yet.</p>
                     ) : (
-                      expenseTransactions.slice(0, 8).map((item, i) => (
-                        <div key={i} className="re-item">
+                      expenseTransactions.slice(0, 8).map((item: any, i) => (
+                        <div key={item.id ?? i} className="re-item">
                           <div className="re-icon-wrap">
                             <span
                               className="re-icon-dot"
@@ -275,8 +269,8 @@ export default function ExpensesPage() {
                             <p className="re-name">{item.category}</p>
                             <p className="re-date">
                               {item.description ?? "—"} ·{" "}
-                              {item.date
-                                ? new Date(item.date).toLocaleDateString("en-US", {
+                              {(item.date ?? item.createdAt ?? item.created_at)
+                                ? new Date(item.date ?? item.createdAt ?? item.created_at).toLocaleDateString("en-US", {
                                     month: "short",
                                     day: "numeric",
                                   })
@@ -296,7 +290,7 @@ export default function ExpensesPage() {
               {/* ── RIGHT COLUMN ── */}
               <div className="expenses-right">
 
-                {/* SPENDING TREND (dynamic weekly bars) */}
+                {/* SPENDING TREND */}
                 <div className="trend-card">
                   <p className="trend-title">Spending Trend — This Month</p>
                   <div className="trend-bars">
@@ -325,12 +319,9 @@ export default function ExpensesPage() {
                     <p className="category-empty">No expense data yet.</p>
                   ) : (
                     <div className="category-body">
-                      {/* Dynamic pie chart */}
                       <div className="category-icon-wrap">
                         <PieChart categories={categoryStats} />
                       </div>
-
-                      {/* Legend */}
                       <div className="category-legend">
                         {categoryStats.slice(0, 4).map((cat) => (
                           <div key={cat.name} className="legend-item">

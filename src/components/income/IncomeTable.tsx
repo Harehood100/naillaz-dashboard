@@ -1,16 +1,31 @@
 import { TransactionData } from "../transactions/NewTransactionModal";
 
-const incomes = [
-  { id: 1, description: "Stellar Tech Solutions",  source: "Services",    sourceType: "services",   date: "May 1, 2026",  amount: 30000,  cleared: true  },
-  { id: 2, description: "Direct Sales - POS",       source: "Sales",       sourceType: "sales",      date: "May 5, 2026",  amount: 50000,  cleared: true  },
-  { id: 3, description: "Vertex Global",            source: "Services",    sourceType: "services",   date: "May 8, 2026",  amount: 30000,  cleared: false },
-  { id: 4, description: "Dividend Payout - ETF",    source: "INVESTMENTS", sourceType: "investment", date: "May 12, 2026", amount: 100000, cleared: true  },
-  { id: 5, description: "Lumina Creatives",         source: "Services",    sourceType: "services",   date: "May 15, 2026", amount: 20000,  cleared: false },
-  { id: 6, description: "Direct Sales - POS",       source: "Sales",       sourceType: "sales",      date: "May 18, 2026", amount: 100000, cleared: true  },
-];
-
 interface Props {
   transactions: TransactionData[];
+}
+
+// Map category names to CSS badge classes already in your stylesheet
+const SOURCE_TYPE_MAP: Record<string, string> = {
+  Salary:     "services",
+  Freelance:  "services",
+  Business:   "sales",
+  Investment: "investment",
+  Gift:       "sales",
+  Refund:     "sales",
+  Other:      "services",
+};
+
+function formatDate(t: any): string {
+  // Backend may return the date under different field names
+  const raw = t.date ?? t.createdAt ?? t.created_at ?? t.transactionDate ?? "";
+  if (!raw) return "—";
+  const d = new Date(raw);
+  if (isNaN(d.getTime())) return raw;
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 export default function IncomeTable({ transactions }: Props) {
@@ -31,29 +46,42 @@ export default function IncomeTable({ transactions }: Props) {
           </tr>
         </thead>
         <tbody>
-          {incomes.map((income) => (
-            <tr key={income.id}>
-              <td className="tx-date">{income.date}</td>
-              <td className="tx-desc">{income.description}</td>
-              <td>
-                <span className={`category-badge category-${income.sourceType}`}>
-                  {income.source}
-                </span>
-              </td>
-              <td>
-                <div className="tx-status">
-                  {income.cleared
-                    ? <span className="status-dot cleared"></span>
-                    : <span className="status-ring"></span>
-                  }
-                  {income.cleared ? "Cleared" : "Pending"}
-                </div>
-              </td>
-              <td className="tx-amount">
-                ${income.amount.toLocaleString()}
+          {transactions.length === 0 ? (
+            <tr>
+              <td colSpan={5} className="tx-empty">
+                No income transactions yet.
               </td>
             </tr>
-          ))}
+          ) : (
+            transactions.map((t: any, i: number) => {
+              const sourceType = SOURCE_TYPE_MAP[t.category] ?? "services";
+              const cleared = t.status === "Cleared";
+
+              return (
+                <tr key={t.id ?? i}>
+                  <td className="tx-date">{formatDate(t)}</td>
+                  <td className="tx-desc">{t.description ?? "—"}</td>
+                  <td>
+                    <span className={`category-badge category-${sourceType}`}>
+                      {t.category}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="tx-status">
+                      {cleared
+                        ? <span className="status-dot cleared"></span>
+                        : <span className="status-ring"></span>
+                      }
+                      {cleared ? "Cleared" : "Pending"}
+                    </div>
+                  </td>
+                  <td className="tx-amount">
+                    ${Number(t.amount).toLocaleString()}
+                  </td>
+                </tr>
+              );
+            })
+          )}
         </tbody>
       </table>
     </div>

@@ -6,15 +6,20 @@ export const createTransaction = async (payload: any) => {
   return response.data;
 };
 
+
 // GET income summary
 export const getIncomeSummary = async () => {
   const response = await api.get("/transactions/income-summary");
   return response.data;
 };
 
-// 🔥 ADD THIS BACK (for expenses page)
+export const createExpense = async (payload: any) => {
+  const response = await api.post("/expenses/add", payload);
+  return response.data;
+};
+
 export const getTransactions = async () => {
-  const response = await api.get("/expenses/add"); 
+  const response = await api.get("/expenses");
   return response.data;
 };
 

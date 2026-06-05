@@ -1,3 +1,5 @@
+// src/components/savings/GoalCard.tsx
+
 type GoalCardProps = {
   title: string;
   percentage: number;
@@ -6,27 +8,29 @@ type GoalCardProps = {
   completion: string;
 };
 
-const getProgressColor = (percentage: number) => {
-  if (percentage >= 75) return "#22c55e"; // green
-  if (percentage >= 50) return "#2D6BE4"; // blue
-  if (percentage <= 10) return "#ef4444"; // red
-  return "#f59e0b"; // amber
-};
+function getProgressColor(percentage: number): string {
+  if (percentage >= 75) return "#22c55e";
+  if (percentage >= 50) return "#2D6BE4";
+  if (percentage <= 10) return "#ef4444";
+  return "#f59e0b";
+}
 
-export default function GoalCard({
-  title,
-  percentage,
-  saved,
-  target,
-  completion,
-}: GoalCardProps) {
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+export default function GoalCard({ title, percentage, saved, target, completion }: GoalCardProps) {
   return (
     <div className="goal-card">
       <h3>{title}</h3>
 
-      <div className="goal-percent">
-        {percentage}%
-      </div>
+      <div className="goal-percent">{percentage}%</div>
 
       <p className="goal-label">Target Met</p>
 
@@ -37,13 +41,8 @@ export default function GoalCard({
         />
       </div>
 
-      <p className="goal-detail">
-        Saved vs Target: {saved}/{target}
-      </p>
-
-      <p className="goal-detail">
-        Est Completion: {completion}
-      </p>
+      <p className="goal-detail">Saved vs Target: {saved}/{target}</p>
+      <p className="goal-detail">Est Completion: {formatDate(completion)}</p>
     </div>
   );
 }

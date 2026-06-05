@@ -81,14 +81,11 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-
   padding: 24px;
   min-height: 160px;
-
   background: #08162d;
   border: 1px dashed #1a2a45;
   border-radius: 12px;
-
   color: #9ca3af;
 }
 
@@ -103,7 +100,6 @@
   border: 1px solid #1a2a45;
   border-radius: 16px;
   padding: 24px;
-   
 }
 
 .chart-header {
@@ -122,7 +118,7 @@
 
 .chart-wrapper {
   height: 400px;
-   width: 100%;
+  width: 100%;
 }
 
 .skeleton {
@@ -164,7 +160,7 @@
     width: 100%;
   }
 
-   .savings-content {
+  .savings-content {
     gap: 20px;
   }
 
@@ -179,7 +175,6 @@
   .chart-wrapper {
     height: 280px;
   }
-
 
   .chart-header {
     text-align: center;
