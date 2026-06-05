@@ -1,104 +1,124 @@
 "use client";
 
-import { useEffect, useState, } from "react";
+import { useEffect, useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import IncomeTable from "@/components/income/IncomeTable";
 import NewTransactionModal, { TransactionData } from "@/components/transactions/NewTransactionModal";
 import RevenueMixChart from "@/components/income/RevenueMixChart";
 import "./income.css";
-import {  getTransactions } from "@/components/services/transactionService";
+import api from "@/utils/api";
 
 export default function IncomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [transactions, setTransactions] = useState<TransactionData[]>([]);
+
+  // ✅ FIX: summary data (NOT transactions array)
+  const [incomeSummary, setIncomeSummary] = useState<any>(null);
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  const loadTransactions = async () => {
-    try {
-      const data = await getTransactions(); // from your transactionService
-      setTransactions(data.transactions); // adjust based on actual response structure
-    } catch (error) {
-      console.error("Failed to fetch transactions:", error);
-    }
+    const loadIncomeSummary = async () => {
+      try {
+        const res = await api.get("/transactions/income-summary");
+
+        // backend returns { success, data: {...} }
+        setIncomeSummary(res.data.data);
+      } catch (error) {
+        console.error("Failed to fetch income summary:", error);
+        setIncomeSummary({
+          totalIncome: 0,
+          revenueMix: [],
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadIncomeSummary();
+  }, []);
+
+  const handleTransactionCreated = (_newTransaction: TransactionData) => {
+    // optional: refresh summary after new income
+    setIsModalOpen(false);
   };
 
-  loadTransactions();
-}, []);
-
-  const handleTransactionCreated = (newTransaction: TransactionData) => {
-  setTransactions((prev) => [newTransaction, ...prev]);
-};
-
-const incomeTransactions = transactions.filter(
-  (t) => t.type === "income"
-);
+  // ✅ FIX: safe fallback array (NO filter, NO crash)
+  const revenueMix = incomeSummary?.revenueMix || [];
 
   return (
     <>
       <AppLayout title="Income" activePage="income">
         <div className="income-content">
 
-          {/* Page Header */}
+          {/* Header */}
           <div className="income-header">
-            <div>
-          
-              <p className="income-subtitle">Monitor your business revenue and incoming cash flow.</p>
-            </div>
-            <button className="add-income-btn" onClick={() => setIsModalOpen(true)}>
+            <p className="income-subtitle">
+              Monitor your business revenue and incoming cash flow.
+            </p>
+
+            <button
+              className="add-income-btn"
+              onClick={() => setIsModalOpen(true)}
+            >
               + Add Income
             </button>
           </div>
 
-          {/* Stat Cards Row */}
+          {/* Stat Cards */}
           <div className="income-stats">
             <div className="income-stat-card">
               <p className="stat-label">TOTAL MONTHLY INCOME</p>
-              <p className="stat-value green">$1,000,000</p>
-              <p className="stat-change">vs. $800,000 last month</p>
+              <p className="stat-value green">
+                ${incomeSummary?.totalIncome || 0}
+              </p>
+              <p className="stat-change">vs. last month</p>
             </div>
 
             <div className="income-stat-card">
-              <p className="stat-label">PENDING PAYMENTS</p>
-              <p className="stat-value orange">$50,000</p>
-              <p className="stat-invoices">6 invoices</p>
+              <p className="stat-label">REVENUE SOURCES</p>
+              <p className="stat-value orange">
+                {revenueMix.length}
+              </p>
+              <p className="stat-invoices">categories</p>
             </div>
 
             <div className="income-stat-card grow-card">
               <p className="grow-title">Grow Your Business</p>
               <p className="grow-desc">
-                Record new revenue or investment dividends to keep your books balanced
+                Record new revenue or investment income
               </p>
-              <button className="add-income-btn-sm" onClick={() => setIsModalOpen(true)}>
+
+              <button
+                className="add-income-btn-sm"
+                onClick={() => setIsModalOpen(true)}
+              >
                 + Add Income
               </button>
             </div>
           </div>
 
-          {/* Recent Transactions */}
-          <IncomeTable transactions={incomeTransactions} />
+          {/* Revenue Table */}
+          <IncomeTable transactions={revenueMix} />
 
-          {/* Revenue Mix + Smart Insight */}
+          {/* Revenue Mix Chart */}
           <div className="revenue-row">
             <div className="revenue-mix-card">
               <h3>Revenue Mix</h3>
+
               <div className="revenue-mix-content">
-                <RevenueMixChart />
+                <RevenueMixChart data={revenueMix} />
+
                 <div className="revenue-legend">
-                  <div className="legend-item">
-                    <span className="legend-dot sales"></span>
-                    <span className="legend-label">Sales</span>
-                    <span className="legend-pct">50%</span>
-                  </div>
-                  <div className="legend-item">
-                    <span className="legend-dot services"></span>
-                    <span className="legend-label">Services</span>
-                    <span className="legend-pct">35%</span>
-                  </div>
-                  <div className="legend-item">
-                    <span className="legend-dot investments"></span>
-                    <span className="legend-label">Investments</span>
-                    <span className="legend-pct">15%</span>
-                  </div>
+                  {revenueMix.map((item: any, idx: number) => (
+                    <div className="legend-item" key={idx}>
+                      <span className="legend-label">
+                        {item.category}
+                      </span>
+                      <span className="legend-pct">
+                        {item.percentage}%
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -107,7 +127,7 @@ const incomeTransactions = transactions.filter(
               <div className="insight-icon">📍</div>
               <p className="insight-title">SMART INSIGHT</p>
               <p className="insight-body">
-                Service revenue is up by 18% compared to last quarter. Consider allocating more resources to service delivery.
+                Service revenue is growing. Consider scaling that category.
               </p>
             </div>
           </div>
@@ -116,12 +136,11 @@ const incomeTransactions = transactions.filter(
       </AppLayout>
 
       {isModalOpen && (
-       <NewTransactionModal
-        onClose={() => setIsModalOpen(false)}
-        onTransactionCreated={handleTransactionCreated}
-        defaultType="income"
-      />
-        
+        <NewTransactionModal
+          onClose={() => setIsModalOpen(false)}
+          onTransactionCreated={handleTransactionCreated}
+          defaultType="income"
+        />
       )}
     </>
   );

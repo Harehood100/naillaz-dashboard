@@ -46,7 +46,6 @@ export default function SettingsPage() {
       <div className="settings-content">
 
         <div className="settings-header">
-          <h1 className="settings-title">Settings</h1>
           <p className="settings-subtitle">
             Manage your business profile, linked accounts, and notification preferences.
           </p>

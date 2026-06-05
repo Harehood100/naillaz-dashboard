@@ -31,7 +31,17 @@ function donutPath(cx: number, cy: number, r: number, innerR: number, startAngle
   ].join(" ");
 }
 
-export default function RevenueMixChart() {
+type RevenueMixItem = {
+  category: string;
+  amount: number;
+  percentage?: number;
+};
+
+interface Props {
+  data: RevenueMixItem[];
+}
+
+export default function RevenueMixChart({ data }: Props) {
   const cx = 70, cy = 70, r = 60, innerR = 38;
   let cursor = 0;
 

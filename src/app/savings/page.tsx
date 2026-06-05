@@ -8,9 +8,9 @@ import CreateGoalModal from "@/components/savingsGoals/CreateGoalModal";
 
 import {
   getSavingsGoals,
-  createSavingsGoal,
   type SavingsGoal,
 } from "@/components/services/savingsService";
+import type { GoalFormData } from "@/components/savingsGoals/CreateGoalModal";
 import "./savings.css";
 
 export default function SavingsPage() {
@@ -18,7 +18,7 @@ export default function SavingsPage() {
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ FETCH ON LOAD (REAL DATA)
+  // Fetch goals on load — fails gracefully if backend getGoals is broken
   useEffect(() => {
     const loadGoals = async () => {
       try {
@@ -26,6 +26,7 @@ export default function SavingsPage() {
         setGoals(data);
       } catch (err) {
         console.error("Failed to load goals:", err);
+        setGoals([]); // show empty state instead of crashing
       } finally {
         setLoading(false);
       }
@@ -34,17 +35,17 @@ export default function SavingsPage() {
     loadGoals();
   }, []);
 
-  const handleCreateGoal = async (goalData: SavingsGoal) => {
-    try {
-      const newGoal = await createSavingsGoal(goalData);
+  useEffect(() => {
+  console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
+}, []);
 
-      // ✅ instantly update UI (optimistic update)
-      setGoals((prev) => [newGoal, ...prev]);
-
-      setIsModalOpen(false);
-    } catch (err) {
-      console.error("Create goal failed:", err);
-    }
+  // Matches onCreateGoal prop type in CreateGoalModal — uses _id not id
+  const handleCreateGoal = (
+    newGoal: GoalFormData & { _id: string; createdAt: string; currentAmount?: number }
+  ) => {
+    // Optimistically add the new goal to the top of the list
+    setGoals((prev) => [newGoal as SavingsGoal, ...prev]);
+    setIsModalOpen(false);
   };
 
   return (

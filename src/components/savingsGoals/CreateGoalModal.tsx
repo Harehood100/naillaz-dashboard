@@ -8,6 +8,7 @@ import "./CreateGoalModal.css";
 export type GoalFormData = {
   goalType: string;
   goalName: string;
+  title?: string; // added to match backend field
   targetAmount: number;
   targetDate: string;
   monthlyContribution: number;
@@ -17,7 +18,13 @@ export type GoalFormData = {
 type CreateGoalModalProps = {
   isOpen: boolean;
   onClose: () => void;
-   onCreateGoal: (goal: GoalFormData & { id: string; createdAt: string }) => void;
+  onCreateGoal: (
+    goal: GoalFormData & {
+      _id: string; // backend returns _id, not id
+      createdAt: string;
+      currentAmount?: number; // backend stores currentAmount, not saved
+    }
+  ) => void;
 };
 
 const goalTypes = [
@@ -54,60 +61,52 @@ export default function CreateGoalModal({
   onCreateGoal,
 }: CreateGoalModalProps) {
   const [loading, setLoading] = useState(false);
-const [error, setError] = useState("");
+  const [error, setError] = useState("");
 
+  const [selectedGoal, setSelectedGoal] = useState("emergency");
 
-  const [selectedGoal, setSelectedGoal] =
-    useState("emergency");
+  const [goalName, setGoalName] = useState("");
 
-  const [goalName, setGoalName] =
-    useState("");
+  const [targetAmount, setTargetAmount] = useState(5000);
 
-  const [targetAmount, setTargetAmount] =
-    useState(5000);
+  const [targetDate, setTargetDate] = useState("");
 
-  const [targetDate, setTargetDate] =
-    useState("");
+  const [monthlyContribution, setMonthlyContribution] = useState(500);
 
-  const [monthlyContribution, setMonthlyContribution] =
-    useState(500);
-
-  const [linkedAccount, setLinkedAccount] =
-    useState("");
+  const [linkedAccount, setLinkedAccount] = useState("");
 
   if (!isOpen) return null;
 
   const handleSubmit = async () => {
-  setLoading(true);
-  setError("");
+    setLoading(true);
+    setError("");
 
-  try {
-    const newGoal = {
-      goalType: selectedGoal,
-      goalName,
-      targetAmount,
-      targetDate,
-      monthlyContribution,
-      linkedAccount,
-    };
+    try {
+      const newGoal = {
+        goalType: selectedGoal,
+        goalName,
+        title: goalName, // backend expects `title`
+        targetAmount,
+        targetDate,
+        monthlyContribution,
+        linkedAccount,
+      };
 
-    const response = await createSavingsGoal(newGoal);
+      const response = await createSavingsGoal(newGoal);
 
-    onCreateGoal(response); // backend response (important later)
-    onClose();
-  } catch (err: any) {
-    console.error(err);
-    setError(err.message || "Something went wrong");
-  } finally {
-    setLoading(false);
-  }
-};
+      onCreateGoal(response); // backend response (important later)
+      onClose();
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const monthsToGoal =
     monthlyContribution > 0
-      ? Math.ceil(
-          targetAmount / monthlyContribution
-        )
+      ? Math.ceil(targetAmount / monthlyContribution)
       : 0;
 
   return (
@@ -116,24 +115,16 @@ const [error, setError] = useState("");
         <div className="goal-header">
           <div>
             <h2>Create New Goal</h2>
-            <p>
-              Set a target and we'll help you
-              get there
-            </p>
+            <p>Set a target and we'll help you get there</p>
           </div>
 
-          <button
-            className="goal-close-btn"
-            onClick={onClose}
-          >
+          <button className="goal-close-btn" onClick={onClose}>
             <X size={18} />
           </button>
         </div>
 
         <div className="goal-section">
-          <span className="section-label">
-            GOAL TYPE
-          </span>
+          <span className="section-label">GOAL TYPE</span>
 
           <div className="goal-types">
             {goalTypes.map((goal) => (
@@ -141,21 +132,13 @@ const [error, setError] = useState("");
                 key={goal.id}
                 type="button"
                 className={`goal-type-card ${
-                  selectedGoal === goal.id
-                    ? "active"
-                    : ""
+                  selectedGoal === goal.id ? "active" : ""
                 }`}
-                onClick={() =>
-                  setSelectedGoal(goal.id)
-                }
+                onClick={() => setSelectedGoal(goal.id)}
               >
-                <span className="goal-type-label">
-                  {goal.label}
-                </span>
+                <span className="goal-type-label">{goal.label}</span>
 
-                <span className="goal-icon">
-                  {goal.icon}
-                </span>
+                <span className="goal-icon">{goal.icon}</span>
               </button>
             ))}
           </div>
@@ -163,21 +146,17 @@ const [error, setError] = useState("");
 
         <div className="target-amount-card">
           <span>Target Amount</span>
-            <div
-                  className="amount-input-wrapper">
-          <span>$</span>
+          <div className="amount-input-wrapper">
+            <span>$</span>
 
-          <input
-            type="number"
-            value={targetAmount}
-            onChange={(e) =>
-              setTargetAmount(Number(e.target.value))
-            }
-            className="target-amount-input"
-          />
+            <input
+              type="number"
+              value={targetAmount}
+              onChange={(e) => setTargetAmount(Number(e.target.value))}
+              className="target-amount-input"
+            />
+          </div>
         </div>
-        </div>
-           
 
         <div className="goal-form-grid">
           <div className="form-group">
@@ -186,9 +165,7 @@ const [error, setError] = useState("");
             <input
               type="text"
               value={goalName}
-              onChange={(e) =>
-                setGoalName(e.target.value)
-              }
+              onChange={(e) => setGoalName(e.target.value)}
               placeholder="e.g Emergency Funds"
             />
           </div>
@@ -199,24 +176,18 @@ const [error, setError] = useState("");
             <input
               type="date"
               value={targetDate}
-              onChange={(e) =>
-                setTargetDate(e.target.value)
-              }
+              onChange={(e) => setTargetDate(e.target.value)}
             />
           </div>
 
           <div className="form-group">
-            <label>
-              Monthly Contribution
-            </label>
+            <label>Monthly Contribution</label>
 
             <input
               type="number"
               value={monthlyContribution}
               onChange={(e) =>
-                setMonthlyContribution(
-                  Number(e.target.value)
-                )
+                setMonthlyContribution(Number(e.target.value))
               }
               placeholder="$500"
             />
@@ -228,33 +199,22 @@ const [error, setError] = useState("");
             <input
               type="text"
               value={linkedAccount}
-              onChange={(e) =>
-                setLinkedAccount(
-                  e.target.value
-                )
-              }
+              onChange={(e) => setLinkedAccount(e.target.value)}
               placeholder="Chase***4412"
             />
           </div>
         </div>
 
         <div className="goal-estimate">
-          💡 At $
-          {monthlyContribution.toLocaleString()}
-          /month you'll reach your goal in{" "}
-          {monthsToGoal} month
-          {monthsToGoal !== 1 ? "s" : ""}
+          💡 At ${monthlyContribution.toLocaleString()}/month you'll reach
+          your goal in {monthsToGoal} month{monthsToGoal !== 1 ? "s" : ""}
         </div>
 
         <div className="goal-footer">
-          <button
-            className="cancel-btn"
-            onClick={onClose}
-          >
+          <button className="cancel-btn" onClick={onClose}>
             Cancel
           </button>
 
-          
           <button
             className="create-goal-btn"
             onClick={handleSubmit}
@@ -263,11 +223,7 @@ const [error, setError] = useState("");
             {loading ? "Creating..." : "⊕ Create Goal"}
           </button>
 
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+          {error && <div className="error-message">{error}</div>}
         </div>
       </div>
     </div>

@@ -1,10 +1,12 @@
 import GoalCard from "./GoalCard";
 
 type Goal = {
-  id: string;
-  goalName: string;
+  _id: string;          // backend returns _id not id
+  goalName?: string;    // frontend field
+  title?: string;       // backend field
   targetAmount: number;
   targetDate: string;
+  currentAmount?: number; // backend field (replaces saved)
   saved?: number;
 };
 
@@ -29,20 +31,25 @@ export default function GoalsGrid({ goals, loading }: Props) {
             <p>Create your first goal to start tracking progress.</p>
           </div>
         )
-        : goals.map((goal) => (
-            <GoalCard
-              key={goal.id}
-              title={goal.goalName}
-              saved={`$${goal.saved ?? 0}`}
-              target={`$${goal.targetAmount}`}
-              percentage={
-                goal.saved && goal.targetAmount
-                  ? Math.round((goal.saved / goal.targetAmount) * 100)
-                  : 0
-              }
-              completion={goal.targetDate}
-            />
-          ))}
+        : goals.map((goal) => {
+            const name = goal.goalName ?? goal.title ?? "Untitled";
+            const saved = goal.saved ?? goal.currentAmount ?? 0;
+
+            return (
+              <GoalCard
+                key={goal._id}                  // _id instead of id
+                title={name}
+                saved={`$${saved}`}
+                target={`$${goal.targetAmount}`}
+                percentage={
+                  saved && goal.targetAmount
+                    ? Math.round((saved / goal.targetAmount) * 100)
+                    : 0
+                }
+                completion={goal.targetDate}
+              />
+            );
+          })}
     </div>
   );
 }

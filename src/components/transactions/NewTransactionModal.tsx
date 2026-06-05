@@ -11,106 +11,80 @@ export type TransactionData = {
   type: "income" | "expense" | "transfer";
   amount: number;
   category: string;
-  date: string;
   description: string;
   account: string;
-};
-
-export type Transaction = TransactionData & {
-  id: string;
-  createdAt: string;
+  status?: string;
+  date: string;
 };
 
 interface NewTransactionModalProps {
   onClose: () => void;
-  onTransactionCreated?: (
-    transaction: TransactionData
-  ) => void;
+  onTransactionCreated?: (transaction: any) => void;
   defaultType?: "expense" | "income" | "transfer";
 }
-  
+
 
 export default function NewTransactionModal({
   onClose,
   onTransactionCreated,
   defaultType = "expense",
 }: NewTransactionModalProps) {
-  const [transactionType, setTransactionType] =
-    useState(defaultType);
-
+  const [transactionType, setTransactionType] = useState(defaultType);
   const [amount, setAmount] = useState("");
-  const [category, setCategory] =
-    useState("Dining & Food");
+  const [category, setCategory] = useState("Dining & Food");
   const [date, setDate] = useState("");
-  const [description, setDescription] =
-    useState("");
-  const [account, setAccount] =
-    useState("");
+  const [description, setDescription] = useState("");
+  const [account, setAccount] = useState("Main Account");
 
-  const [loading, setLoading] =
-  useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-const [error, setError] =
-  useState("");
+  const handleSave = async () => {
+    setError("");
 
-const handleSave = async () => {
-  setError("");
+    if (!amount || Number(amount) <= 0) {
+      setError("Please enter a valid amount.");
+      return;
+    }
 
-  if (!amount || Number(amount) <= 0) {
-    setError(
-      "Please enter a valid amount."
-    );
-    return;
-  }
+    if (!description.trim()) {
+      setError("Please add a description.");
+      return;
+    }
 
-  if (!date) {
-    setError(
-      "Please select a transaction date."
-    );
-    return;
-  }
+    try {
+      setLoading(true);
 
-  try {
-    setLoading(true);
+      // ✅ IMPORTANT: matches backend exactly
+      const payload = {
+        type: transactionType,
+        category,
+        description,
+        account,
+        amount: Number(amount),
+        status: "Cleared",
+      };
 
-    const payload = {
-      type: transactionType,
-      amount: Number(amount),
-      category,
-      date,
-      description,
-      account,
-    };
+      const res = await createTransaction(payload); 
 
-    const createdTransaction =
-      await createTransaction(payload);
+      console.log("Transaction created:", res);
 
-    console.log(
-      "Transaction created:",
-      createdTransaction
-    );
+      onTransactionCreated?.(res?.data ?? res);
 
-    onTransactionCreated?.(
-      createdTransaction
-    );
+      onClose();
+    } catch (err: any) {
+      console.error("Transaction error:", err);
 
-    onClose();
-  } catch (err: any) {
-    console.error(
-      "Failed to create transaction:",
-      err
-    );
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to save transaction.";
 
-    setError(
-      err?.response?.data?.message ||
-        "Failed to save transaction."
-    );
-  } finally {
-    setLoading(false);
-  }
-};
-
-  
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div

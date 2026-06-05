@@ -11,16 +11,9 @@
   margin-bottom: 8px;
 }
 
-.settings-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #ffffff;
-  letter-spacing: -0.02em;
-  margin-bottom: 8px;
-}
 
 .settings-subtitle {
-  font-size: 15px;
+  font-size: 20px;
   color: #9ca3af;
   line-height: 1.6;
 }
