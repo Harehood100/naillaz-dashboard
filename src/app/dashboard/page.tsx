@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import NewTransactionModal from "@/components/transactions/NewTransactionModal";
-import { getTransactions } from "@/components/services/transactionService";
+import { getAllTransactions } from "@/components/services/transactionService";
 import { dashboardAPI } from "@/lib/api";
 import { getSavingsGoals } from "@/components/services/savingsService";
 import "./dashboard.css";
