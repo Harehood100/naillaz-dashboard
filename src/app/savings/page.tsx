@@ -15,27 +15,44 @@ export default function SavingsPage() {
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadGoals = async () => {
-      try {
-        const data = await getSavingsGoals();
-        setGoals(data);
-      } catch (err) {
-        console.error("Failed to load goals:", err);
-        setGoals([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadGoals = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
+    try {
+      const data = await getSavingsGoals();
+      setGoals(data);
+    } catch (err) {
+      console.error("Failed to load goals:", err);
+      setGoals([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadGoals();
+    window.addEventListener("focus", loadGoals);
+    return () => window.removeEventListener("focus", loadGoals);
   }, []);
 
-  const handleCreateGoal = (
+  const handleCreateGoal = async (
     newGoal: GoalFormData & { _id: string; createdAt: string; currentAmount?: number }
   ) => {
+    // Optimistic update so UI feels instant
     setGoals((prev) => [newGoal as SavingsGoal, ...prev]);
     setIsModalOpen(false);
+
+    // Re-fetch from server so state survives reload
+    try {
+      const data = await getSavingsGoals();
+      setGoals(data);
+    } catch (err) {
+      console.error("Failed to refresh goals after create:", err);
+    }
   };
 
   return (

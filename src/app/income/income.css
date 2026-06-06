@@ -3,16 +3,15 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding: 24px;
+  padding-bottom: 2rem;
 }
 
 /* ─── Header ─────────────────────────────────────────── */
 .income-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
 }
-
 
 .income-subtitle {
   font-size: 20px;
@@ -26,7 +25,7 @@
   color: #ffffff;
   border: none;
   border-radius: 8px;
-  padding: 10px 18px;
+  padding: 15px 20px;
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
@@ -46,39 +45,41 @@
 }
 
 .income-stat-card {
-  background: #0d1f3c;
-  border: 1px solid #1a2e4a;
-  border-radius: 12px;
-  padding: 22px 24px;
   background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 40px 24px;
 }
 
 .stat-label {
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
   color: #6b7fa3;
-  margin: 0 0 10px 0;
+  margin: 0 0 10px;
   text-transform: uppercase;
 }
 
 .stat-value {
   font-size: 30px;
   font-weight: 700;
-  margin: 0 0 6px 0;
+  margin: 0 0 6px;
+  line-height: 1.1;
 }
 
 .stat-value.green  { color: #22c55e; }
 .stat-value.orange { color: #f97316; }
 
 .stat-change {
-  font-size: 16px;
-  color: #6b7fa3;
+  font-size: 14px;
   margin: 0;
 }
 
+.stat-change.positive { color: #22c55e; }
+.stat-change.negative { color: #ef4444; }
+
 .stat-invoices {
-  font-size: 16px;
+  font-size: 13px;
   color: #94a3b8;
   margin: 0;
 }
@@ -88,13 +89,13 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 8px;
-  background: transparent;
-  border: 1px solid #6b7fa3;
+  gap: 10px;
+  background: #0d1f3c !important;
+  border: 1px solid #6b7fa3 !important;
 }
 
 .grow-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: #ffffff;
   margin: 0;
@@ -103,7 +104,7 @@
 .grow-desc {
   font-size: 16px;
   color: #6b7fa3;
-  line-height: 1.5;
+  line-height: 1.55;
   margin: 0;
 }
 
@@ -112,12 +113,13 @@
   color: #ffffff;
   border: none;
   border-radius: 8px;
-  padding: 8px 14px;
+  padding: 10px 16px;
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
   width: fit-content;
   transition: background 0.2s;
+  margin-top: 4px;
 }
 
 .add-income-btn-sm:hover {
@@ -127,22 +129,22 @@
 /* ─── Transactions Table Card ─────────────────────────── */
 .income-table-card {
   background: #0d1f3c;
-  border-radius: 10px;
+  border: 1px solid #1a2e4a;
+  border-radius: 12px;
   padding: 24px;
   overflow-x: auto;
-  margin-top: 26px;
 }
 
 .table-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .table-header-row h3 {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
   color: #ffffff;
   margin: 0;
 }
@@ -162,83 +164,72 @@
 .income-table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 0 10px;
-  font-size: 16px;
+  border-spacing: 0 8px;
+  font-size: 14px;
   background: transparent;
 }
- 
-.income-table thead,
-.income-table tbody,
-.income-table tr,
-.income-table th,
-.income-table td {
-  color: inherit;
-}
- 
+
 .income-table thead th {
   text-align: left;
   font-size: 16px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.09em;
   background: #1a2e4a;
   color: #ffffff;
-  padding: 10px 12px 12px 8px;
-  border-bottom: 1px solid #1a2e4a;
+  padding: 10px 14px;
   text-transform: uppercase;
 }
- 
+
+.income-table thead th:first-child { border-radius: 6px 0 0 6px; }
+.income-table thead th:last-child  { border-radius: 0 6px 6px 0; }
+
 .income-table tbody tr td {
-  background: #ffffff !important;
+  background: #ffffff;
   color: #0d1f3c;
 }
- 
 
-.income-table tbody tr {
-  border-bottom: 10px solid transparent;
-}
- 
-.income-table tbody tr:last-child {
-  border-bottom: none;
-}
- 
+.income-table tbody tr td:first-child { border-radius: 6px 0 0 6px; }
+.income-table tbody tr td:last-child  { border-radius: 0 6px 6px 0; }
+
 .income-table tbody td {
-  padding: 14px 12px 14px 8px;
+  padding: 12px 14px;
   vertical-align: middle;
 }
- 
+
 .tx-date {
   color: #4a5f80;
   font-size: 16px;
   white-space: nowrap;
 }
- 
+
 .tx-desc {
   color: #0d1f3c;
   font-weight: 600;
   font-size: 16px;
 }
- 
+
 .tx-amount {
   color: #0d1f3c;
-  font-weight: 600;
+  font-weight: 700;
   text-align: right;
   white-space: nowrap;
   font-size: 16px;
 }
- 
+
 /* ─── Category Badges ─────────────────────────────────── */
 .category-badge {
   display: inline-block;
-  border-radius: 3px;
-  padding: 8px 10px;
-  font-size: 13px;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
   font-weight: 600;
+  letter-spacing: 0.03em;
 }
- 
-.category-services   { background: #2D6BE433; color: #60a5fa; }
-.category-sales      { background: #22C55E33; color: #4ade80; }
-.category-investment { background: #F59E0B66; color: #fbbf24; text-transform: uppercase; font-size: 13px; letter-spacing: 0.04em; }
- 
+
+.category-services   { background: rgba(45,107,228,0.2);  color: #60a5fa; }
+.category-sales      { background: rgba(34,197,94,0.2);   color: #4ade80; }
+.category-investment { background: rgba(245,158,11,0.25); color: #fbbf24; text-transform: uppercase; font-size: 11px; letter-spacing: 0.06em; }
+
 /* ─── Status ──────────────────────────────────────────── */
 .tx-status {
   color: #4a5f80;
@@ -248,17 +239,17 @@
   white-space: nowrap;
   font-size: 16px;
 }
- 
+
 .status-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
 }
- 
+
 .status-dot.cleared { background: #22c55e; }
 .status-dot.pending { background: #f97316; }
- 
+
 .status-ring {
   width: 7px;
   height: 7px;
@@ -267,14 +258,12 @@
   flex-shrink: 0;
   background: transparent;
 }
- 
 
-/* ─── Revenue Mix + Insight Row ───────────────────────── */
+/* ─── Revenue Mix + Smart Insight Row ────────────────── */
 .revenue-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-top: 26px;
+  gap: 20px;
 }
 
 .revenue-mix-card {
@@ -286,9 +275,9 @@
 
 .revenue-mix-card h3 {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
   color: #ffffff;
-  margin: 0 0 20px 0;
+  margin: 0 0 20px;
 }
 
 .revenue-mix-content {
@@ -311,8 +300,8 @@
 }
 
 .legend-dot {
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   border-radius: 3px;
   flex-shrink: 0;
 }
@@ -322,18 +311,18 @@
 .legend-dot.investments { background: #f97316; }
 
 .legend-label {
-  font-size: 13px;
+  font-size: 16px;
   color: #94a3b8;
   flex: 1;
 }
 
 .legend-pct {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   color: #e2e8f0;
 }
 
-/* ─── Smart Insight ───────────────────────────────────── */
+/* ─── Smart Insight Card ──────────────────────────────── */
 .smart-insight-card {
   background: #0d1f3c;
   border: 1px solid #1a2e4a;
@@ -341,18 +330,19 @@
   padding: 28px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
   justify-content: center;
 }
 
 .insight-icon {
   font-size: 20px;
+  line-height: 1;
 }
 
 .insight-title {
   font-size: 20px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   color: #6b7fa3;
   margin: 0;
   text-transform: uppercase;
@@ -361,8 +351,16 @@
 .insight-body {
   font-size: 16px;
   color: #94a3b8;
-  line-height: 1.6;
+  line-height: 1.65;
   margin: 0;
+}
+
+/* ─── Loading ─────────────────────────────────────────── */
+.income-loading {
+  color: #6b7fa3;
+  font-size: 14px;
+  padding: 20px 0;
+  text-align: center;
 }
 
 /* ─── Responsive ──────────────────────────────────────── */
@@ -375,7 +373,7 @@
 @media (max-width: 768px) {
   .income-stats { grid-template-columns: 1fr; }
   .grow-card { grid-column: span 1; }
-  .income-header { flex-direction: column; gap: 16px; }
+  .income-header { flex-direction: column; gap: 14px; }
   .add-income-btn { width: 100%; text-align: center; }
   .revenue-mix-content { flex-direction: column; }
 }

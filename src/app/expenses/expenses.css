@@ -1,9 +1,12 @@
+/* ─── Layout ─────────────────────────────────────────── */
 .expenses-content {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding-bottom: 2rem;
 }
 
+/* ─── Header ─────────────────────────────────────────── */
 .expenses-header {
   display: flex;
   justify-content: space-between;
@@ -17,187 +20,243 @@
 }
 
 .add-expense-btn {
-  background: #e74c3c;
+  background: #1d6efa;
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 9px 18px;
+  padding: 10px 20px;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 20px;
+  font-weight: 600;
   transition: background 0.2s;
+  white-space: nowrap;
 }
-.add-expense-btn:hover { background: #c0392b; }
 
-/* ── Loading state ── */
+.add-expense-btn:hover { background: #1558d6; }
+
+/* ─── Loading ─────────────────────────────────────────── */
 .expenses-loading {
   padding: 48px;
   text-align: center;
   color: #94a3b8;
-  font-size: 0.95rem;
+  font-size: 20px;
   letter-spacing: 0.05em;
 }
 
-/* Two-column layout */
-.expenses-two-col {
+/* ─── Main Grid: 2 columns ────────────────────────────── */
+.expenses-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 30px;
   align-items: start;
 }
 
-.expenses-left,
-.expenses-right {
+.expenses-col {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
-/* ── Budget Progress Card ── */
+/* ─── Budget Progress Card ────────────────────────────── */
 .budget-card {
   background: #ffffff;
-  border: 1px solid #1a2a45;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  padding: 28px 32px;
-  margin-bottom: 20px;
+  padding: 35px 30px;
 }
+
 .budget-label {
-  font-size: 16px;
-  letter-spacing: 0.08em;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
   color: #6b7a99;
   margin: 0 0 10px;
   text-transform: uppercase;
 }
-.budget-amount { margin-bottom: 12px; }
+
+.budget-amount {
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
 .budget-current {
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 700;
-  color: #000;
+  color: #0d1f3c;
 }
+
+.budget-sep {
+  font-size: 23px;
+  color: #94a3b8;
+  margin: 0 4px;
+}
+
 .budget-total {
-  font-size: 18px;
-  color: #000;
+  font-size: 23px;
+  color: #94a3b8;
 }
+
 .budget-bar-track {
-  height: 8px;
-  background: #1a2a45;
+  height: 10px;
+  background: #e2e8f0;
   border-radius: 4px;
   margin-bottom: 10px;
   overflow: hidden;
 }
+
 .budget-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #e74c3c);
+  background: #3b82f6;
   border-radius: 4px;
   transition: width 0.4s ease;
 }
-/* Dynamic colour states */
-.budget-bar-fill.warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-.budget-bar-fill.danger  { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+.budget-bar-fill.warning { background: #f59e0b; }
+.budget-bar-fill.danger  { background: #ef4444; }
 
 .budget-footer {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
-.budget-pct { font-size: 12px; color: #6b7a99; }
-.budget-remaining { font-size: 12px; color: #e74c3c; }
-.budget-remaining.over { color: #f87171; }
 
-/* ── Recent Expenses Card ── */
+.budget-pct {
+  font-size: 16px;
+  color: #6b7a99;
+}
+
+.budget-remaining {
+  font-size: 16px;
+  font-weight: 600;
+  color: #22c55e;
+}
+
+.budget-remaining.over { color: #ef4444; }
+
+/* ─── Recent Expenses Card ────────────────────────────── */
 .recent-expenses-card {
   background: #0a1628;
   border: 1px solid #1a2a45;
   border-radius: 12px;
-  padding: 20px 0;
+  overflow: hidden;
 }
+
 .re-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px 14px;
+  padding: 19px 20px 18px;
 }
+
 .re-title {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
   color: #ffffff;
+  margin: 0;
 }
+
 .re-view-all {
   font-size: 16px;
   color: #3b82f6;
   text-decoration: none;
+  font-weight: 500;
 }
-.re-list { display: flex; flex-direction: column; gap: 8px; }
+
+.re-view-all:hover { text-decoration: underline; }
+
+.re-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 20px 20px;
+}
 
 .re-empty {
   color: #64748b;
-  font-size: 0.85rem;
-  padding: 12px 20px;
+  font-size: 16px;
+  padding: 16px 20px 18px;
 }
 
 .re-item {
   display: flex;
   align-items: center;
-  gap: 13px;
-  padding: 12px 28px;
-  background: white;
-  border-bottom: 1px solid #0d1f38;
+  gap: 15px;
+  padding: 14px 20px;
+  background: #ffffff;
+  border-top: 1px solid #f1f5f9;
   transition: background 0.15s;
-  border-radius: 8px;
 }
-.re-item:last-child { border-bottom: none; }
-.re-item:hover { background: #ccd6e4; }
+
+.re-item:hover { background: #f0f4ff; }
 
 .re-icon-wrap {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-/* Coloured dot replacing the emoji */
-.re-icon-dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+
 .re-icon { font-size: 16px; }
 
-.re-info { flex: 1; min-width: 0; }
+.re-info {
+  flex: 1;
+  min-width: 0;
+}
+
 .re-name {
-  font-size: 14px;
-  color: #000000;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0d1f3c;
   margin: 0 0 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.re-date { font-size: 10px; color: #4a5a7a; margin: 0; }
-.re-amount { font-size: 13px; font-weight: 600; color: #e74c3c; flex-shrink: 0; }
 
-/* ── Spending Trend Card ── */
+.re-date {
+  font-size: 13px;
+  color: #6b7a99;
+  margin: 0;
+  letter-spacing: 0.03em;
+}
+
+.re-amount {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ef4444;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ─── Right column section label ─────────────────────── */
+.right-section-label { display: none; }
+
+/* ─── Spending Trend Card ─────────────────────────────── */
 .trend-card {
   background: #0a1628;
-  border: 1px solid rgba(255, 0, 0, 0.534);
+  border: 1px solid #1a2a45;
   border-radius: 12px;
-  padding: 28px 32px;        /* reduced from 50px to give bars room */
-  margin-bottom: 20px;
+  padding: 26px 28px 20px;
 }
+
 .trend-title {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
   color: #ffffff;
-  margin: 0 0 20px;
+  margin: 0 0 18px;
 }
+
 .trend-bars {
   display: flex;
   align-items: flex-end;
-  gap: 20px;
-  height: 110px;
+  gap: 12px;
+  height: 120px;
+  padding-bottom: 4px;
 }
+
 .trend-bar-col {
   display: flex;
   flex-direction: column;
@@ -205,164 +264,164 @@
   gap: 4px;
   flex: 1;
 }
-/* Value label above the bar */
+
 .trend-bar-value {
-  font-size: 10px;
+  font-size: 13px;
   color: #94a3b8;
+  min-height: 14px;
   display: block;
   text-align: center;
-  min-height: 14px;           /* keeps alignment even when empty */
 }
+
 .trend-bar {
-  width: 90%;
-  background: linear-gradient(180deg, #3b82f6, #1e3a5f);
+  width: 100%;
+  background: #3b82f6;
   border-radius: 4px 4px 0 0;
   min-height: 4px;
   transition: height 0.4s ease;
 }
-.trend-bar-label { font-size: 11px; color: #6b7a99; margin: 0; }
 
-/* ── Category Summary Card ── */
+.trend-bar--peak {
+  background: #ef4444;
+}
+
+.trend-bar-label {
+  font-size: 13px;
+  color: #6b7a99;
+  margin: 0;
+  letter-spacing: 0.06em;
+}
+
+/* ─── Spending Limits Card ────────────────────────────── */
+.limits-card {
+  background: #0a1628;
+  border: 1px solid #1a2a45;
+  border-radius: 12px;
+  padding: 30px 22px;
+}
+
+.limits-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 16px;
+}
+
+.limits-empty {
+  color: #64748b;
+  font-size: 16px;
+}
+
+.limit-item {
+  margin-bottom: 14px;
+}
+
+.limit-item:last-child { margin-bottom: 0; }
+
+.limit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+  gap: 10px;
+}
+
+.limit-name {
+  font-size: 15px;
+  color: #c8d4e8;
+  white-space: nowrap;
+}
+
+.limit-range {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%;
+  text-align: right;
+}
+
+.limit-range.safe    { color: #22c55e; }
+.limit-range.warning { color: #f59e0b; }
+.limit-range.danger  { color: #ef4444; }
+
+.limit-bar-track {
+  height: 6px;
+  background: #1a2a45;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.limit-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.limit-bar-fill.safe    { background: #22c55e; }
+.limit-bar-fill.warning { background: #f59e0b; }
+.limit-bar-fill.danger  { background: #ef4444; }
+
+/* ─── Category Summary Card ───────────────────────────── */
 .category-card {
   background: #0a1628;
   border: 1px solid #1a2a45;
   border-radius: 12px;
-  padding: 24px 28px;         /* reduced from 80px/60px so legend fits */
+  padding: 30px 22px;
 }
+
 .category-title {
   font-size: 20px;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   color: #6b7a99;
   text-transform: uppercase;
   margin: 0 0 14px;
 }
+
 .category-body {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
 }
+
 .category-icon-wrap {
-  width: 100px;
-  height: 100px;
+  width: 72px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-/* Legend sits to the right of the pie */
-.category-legend {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  flex: 1;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-}
-.legend-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.legend-name {
-  flex: 1;
-  color: #cbd5e1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.legend-amount {
-  color: #94a3b8;
-  font-variant-numeric: tabular-nums;
-}
+
+.category-info { flex: 1; }
 
 .category-name {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   color: #ffffff;
-  margin: 0 0 2px;
+  margin: 0 0 4px;
 }
+
 .category-sub {
   font-size: 13px;
   color: #6b7a99;
-  margin: 10px 0 0;
+  margin: 0;
 }
-.category-sub strong { color: #cbd5e1; }
 
 .category-empty {
+  font-size: 13px;
   color: #64748b;
-  font-size: 0.85rem;
-  padding: 4px 0;
 }
 
-/* ── Spending Limits Card ── */
-.limits-card {
-  background: #0a1628;
-  border: 1px solid #1a2a45;
-  border-radius: 12px;
-  padding: 24px 28px;         /* reduced from 90px/50px so items fit */
-  margin-bottom: 20px;
-}
-.limits-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #ffffff;
-  margin: 0 0 14px;
-}
-.limits-section-title {
-  font-size: 16px;
-  color: #6b7a99;
-  margin: 0 0 12px;
-}
-.limits-empty {
-  color: #64748b;
-  font-size: 0.85rem;
-}
-.limit-item { margin-bottom: 16px; }
-.limit-item:last-child { margin-bottom: 0; }
-.limit-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
-.limit-name { font-size: 14px; color: #c8d4e8; }
-
-/* Status labels */
-.limit-range       { font-size: 12px; color: #22c55e; }
-.limit-range.safe  { color: #22c55e; }
-.limit-range.warning { color: #f59e0b; }
-.limit-range.danger  { color: #ef4444; }
-
-.limit-bar-track {
-  height: 8px;
-  background: #1a2a45;
-  border-radius: 4px;
-  overflow: hidden;
-}
-.limit-bar-fill          { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
-.limit-bar-fill.safe     { background: #22c55e; }
-.limit-bar-fill.warning  { background: #f59e0b; }
-.limit-bar-fill.danger   { background: #ef4444; }
-
-/* Spent / limit row below each bar */
-.limit-footer {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 4px;
-}
-.limit-spent { font-size: 11px; color: #64748b; }
-.limit-pct   { font-size: 11px; color: #64748b; }
-
-/* ── Responsive ── */
-@media (max-width: 900px) {
-  .expenses-two-col { grid-template-columns: 1fr; }
+/* ─── Responsive ──────────────────────────────────────── */
+@media (max-width: 960px) {
+  .expenses-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px) {
-  .expenses-subtitle { font-size: 18px; }
-  .add-expense-btn { font-size: 14px; padding: 8px 16px; }
+  .expenses-subtitle { font-size: 13px; }
+  .add-expense-btn { font-size: 13px; padding: 9px 16px; }
+  .budget-current { font-size: 22px; }
 }

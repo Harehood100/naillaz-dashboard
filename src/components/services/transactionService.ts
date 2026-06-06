@@ -1,29 +1,46 @@
 import api from "@/utils/api";
 
-// CREATE income/expense
+const STORAGE_KEY = "demo_transactions";
+
+// ─── LOCAL HELPERS ───────────────────────────────
+const getLocal = () =>
+  typeof window !== "undefined"
+    ? JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")
+    : [];
+
+const saveLocal = (data: any[]) =>
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+// ─── TRANSACTIONS ONLY (SAFE ISOLATION) ──────────
 export const createTransaction = async (payload: any) => {
-  const response = await api.post("/transactions", payload);
-  return response.data;
+  // demo fallback ONLY for transactions
+  const newTx = {
+    ...payload,
+    _id: Date.now().toString(),
+    createdAt: new Date().toISOString(),
+  };
+
+  const existing = getLocal();
+  const updated = [newTx, ...existing];
+
+  saveLocal(updated);
+
+  return newTx;
 };
 
-
-// GET income summary
-export const getIncomeSummary = async () => {
-  const response = await api.get("/transactions/income-summary");
-  return response.data;
-};
-
-export const createExpense = async (payload: any) => {
-  const response = await api.post("/expenses/add", payload);
-  return response.data;
-};
-
-export const getTransactions = async () => {
-  const response = await api.get("/expenses");
-  return response.data;
-};
 export const getAllTransactions = async () => {
-  const response = await api.get("/transactions");
-  return response.data;
-};
+  // try backend first
+  try {
+    const res = await api.get("/transactions");
+    const data = res?.data?.data;
 
+    if (Array.isArray(data) && data.length > 0) {
+      return data;
+    }
+  } catch (err) {
+    console.log("Backend failed, using demo mode");
+  }
+
+  // fallback ONLY for transactions
+  return getLocal();
+};

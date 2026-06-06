@@ -1,203 +1,243 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import NewTransactionModal from "@/components/transactions/NewTransactionModal";
 import { getAllTransactions } from "@/components/services/transactionService";
-import { dashboardAPI } from "@/lib/api";
 import { getSavingsGoals } from "@/components/services/savingsService";
 import "./dashboard.css";
 
-// Fallback data if API fails
-const fallbackTransactions = [
-  { id: 1, icon: "🖥️", name: "Amazon Web Service", date: "YESTERDAY, 2:00PM", amount: -156.00 },
-  { id: 2, icon: "🍽️", name: "The Bistro Downtown", date: "TODAY, 7:50AM", amount: -42.50 },
-  { id: 3, icon: "🖨️", name: "Direct Sales - POS", date: "MAY 5, 2:00PM", amount: 3150.25 },
-  { id: 4, icon: "✈️", name: "Lufthansa Airlines", date: "MAY 10 9:00AM", amount: -840.00 },
-  { id: 5, icon: "💰", name: "Dividend Payout -ETF", date: "MAY 12, 11:00AM", amount: -42.50 },
-  { id: 6, icon: "📐", name: "Lamina Creatives", date: "May 15, 3:30PM", amount: 3215.00 },
-  { id: 7, icon: "☕", name: "Blue Bottle Coffee", date: "MAY 20, 7:50AM", amount: -12.50 },
-  { id: 8, icon: "⛽", name: "Shell Gasoline", date: "MAY 20, 12:36PM", amount: -85.20 },
-];
+// ─── helpers ─────────────────────────────────────────────
 
-const weeklyData = [18, 42, 28, 55, 35, 68];
-const monthlyData = [32, 58, 44, 72, 48, 85];
-const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN"];
+function formatCurrency(amount: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(Math.abs(amount));
+}
 
-// Helper to get transaction icon based on category or description
+function formatDate(dateStr: string) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function formatDateTime(dateStr: string) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function buildChartData(transactions: any[]) {
+  const now = new Date();
+
+  const months = Array.from({ length: 6 }).map((_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+    return {
+      label: d.toLocaleString("en-US", { month: "short" }).toUpperCase(),
+      year: d.getFullYear(),
+      month: d.getMonth(),
+    };
+  });
+
+  const income = months.map(({ year, month }) =>
+    transactions
+      .filter((t) => {
+        const d = new Date(t.date ?? t.createdAt);
+        return (
+          d.getFullYear() === year &&
+          d.getMonth() === month &&
+          (t.type === "income" || (t.amount ?? 0) > 0)
+        );
+      })
+      .reduce((sum, t) => sum + Math.abs(Number(t.amount || 0)), 0)
+  );
+
+  const expense = months.map(({ year, month }) =>
+    transactions
+      .filter((t) => {
+        const d = new Date(t.date ?? t.createdAt);
+        return (
+          d.getFullYear() === year &&
+          d.getMonth() === month &&
+          (t.type === "expense" || (t.amount ?? 0) < 0)
+        );
+      })
+      .reduce((sum, t) => sum + Math.abs(Number(t.amount || 0)), 0)
+  );
+
+  return {
+    income,
+    expense,
+    labels: months.map((m) => m.label),
+  };
+}
+
+// category → icon emoji mapping
 function getTxIcon(tx: any): string {
-  const name = (tx.description || tx.name || "").toLowerCase();
-  const category = (tx.category || "").toLowerCase();
-  if (category.includes("food") || category.includes("dining")) return "🍽️";
-  if (category.includes("transport")) return "🚗";
-  if (category.includes("entertainment")) return "🎬";
-  if (category.includes("utilities")) return "⚡";
-  if (category.includes("shopping")) return "🛒";
-  if (category.includes("health")) return "🏥";
-  if (name.includes("amazon")) return "🖥️";
-  if (name.includes("airline") || name.includes("flight")) return "✈️";
-  if (name.includes("coffee")) return "☕";
-  if (name.includes("gas") || name.includes("fuel")) return "⛽";
+  const desc = (tx.description ?? tx.category ?? "").toLowerCase();
+  if (desc.includes("amazon") || desc.includes("shop")) return "🛒";
+  if (desc.includes("bistro") || desc.includes("food") || desc.includes("restaurant")) return "🍽️";
+  if (desc.includes("sales") || desc.includes("pos")) return "💼";
+  if (desc.includes("airline") || desc.includes("flight") || desc.includes("lufthansa")) return "✈️";
+  if (desc.includes("dividend") || desc.includes("etf") || desc.includes("invest")) return "📈";
+  if (desc.includes("creative") || desc.includes("design") || desc.includes("freelance")) return "🎨";
   if (tx.type === "income") return "💰";
   return "💳";
 }
 
-// Helper to format date
-function formatDate(dateStr: string): string {
-  if (!dateStr) return "";
-  try {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", {
-      month: "short", day: "numeric", year: "numeric"
-    }).toUpperCase();
-  } catch {
-    return dateStr;
-  }
-}
-
-// Helper to format currency
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency", currency: "USD"
-  }).format(Math.abs(amount));
-}
+// ─── PAGE ─────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const [period, setPeriod] = useState<"weekly" | "monthly">("weekly");
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [savingsGoal, setSavingsGoal] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [chartView, setChartView] = useState<"weekly" | "monthly">("weekly");
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"income" | "expense">("income");
 
-  // API data state
-  const [transactions, setTransactions] = useState<any[]>(fallbackTransactions);
-  const [summary, setSummary] = useState<any>(null);
-  const [savingsGoal, setSavingsGoal] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  const data = period === "weekly" ? weeklyData : monthlyData;
-  const maxVal = Math.max(...data);
-
-  // Fetch all dashboard data
-  const fetchDashboardData = async () => {
+  // ─── FETCH ─────────────────────────────────────────────
+  const fetchData = useCallback(async () => {
     try {
-      // Fetch all three in parallel
-      const [summaryData, txData, savingsData] = await Promise.allSettled([
-        dashboardAPI.getSummary(),
-        getTransactions(),
+      setLoading(true);
+
+      const [txRes, savingsRes] = await Promise.all([
+        getAllTransactions(),
         getSavingsGoals(),
       ]);
 
-      // Update summary/stat cards
-      if (summaryData.status === "fulfilled" && summaryData.value) {
-        setSummary(summaryData.value);
-      }
-
-      // Update transactions
-      if (txData.status === "fulfilled" && txData.value && txData.value.length > 0) {
-        setTransactions(txData.value);
-      }
-
-      // Update savings goal — use first goal
-      if (savingsData.status === "fulfilled" && savingsData.value && savingsData.value.length > 0) {
-        setSavingsGoal(savingsData.value[0]);
-      }
-
+      setTransactions(Array.isArray(txRes) ? txRes : []);
+      setSavingsGoal(Array.isArray(savingsRes) ? savingsRes[0] : savingsRes);
     } catch (err) {
-      console.error("Dashboard fetch error:", err);
-      // fallback data already set as default state
+      console.error(err);
+      setTransactions([]);
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchDashboardData();
   }, []);
 
-  // Derived values from summary
-  const totalBalance = summary?.totalBalance ?? summary?.balance ?? 45285.90;
-  const monthlyIncome = summary?.monthlyIncome ?? summary?.income ?? 12400.00;
-  const monthlyExpenses = summary?.monthlyExpenses ?? summary?.expenses ?? 6842.15;
-  const incomeTarget = summary?.incomeTarget ?? monthlyIncome * 1.2;
-  const expenseBudget = summary?.expenseBudget ?? monthlyExpenses * 1.8;
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-  const incomePct = Math.min(Math.round((monthlyIncome / incomeTarget) * 100), 100);
-  const expensePct = Math.min(Math.round((monthlyExpenses / expenseBudget) * 100), 100);
+  // ─── DERIVED DATA ─────────────────────────────────────
 
-  // Savings goal values
-  const goalName = savingsGoal?.name ?? savingsGoal?.title ?? "New Home Fund";
-  const goalSaved = savingsGoal?.saved ?? savingsGoal?.currentAmount ?? 0;
-  const goalTarget = savingsGoal?.targetAmount ?? savingsGoal?.target ?? 1;
-  const goalPct = Math.min(Math.round((goalSaved / goalTarget) * 100), 100);
+  const totalBalance = transactions.reduce((sum, t) => {
+    return sum + (t.type === "expense" ? -Math.abs(t.amount) : Math.abs(t.amount));
+  }, 0);
+
+  const monthlyIncome = transactions
+    .filter((t) => t.type === "income")
+    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+
+  const monthlyExpenses = transactions
+    .filter((t) => t.type === "expense")
+    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+
+  const chartData = buildChartData(transactions);
+  const maxVal = Math.max(...chartData.income, ...chartData.expense, 1);
+
+  // ─── SAVINGS ─────────────────────────────────────────
+  const goalSaved = savingsGoal?.saved ?? 0;
+  const goalTarget = savingsGoal?.targetAmount ?? 1;
+  const goalPct = Math.min((goalSaved / goalTarget) * 100, 100);
+
+  // Monthly income budget progress (e.g. 85% of a notional monthly target)
+  const incomeTarget = monthlyIncome > 0 ? monthlyIncome * 1.18 : 1;
+  const incomePct = Math.min((monthlyIncome / incomeTarget) * 100, 100);
+
+  // Monthly expense budget consumption
+  const expenseTarget = monthlyExpenses > 0 ? monthlyExpenses * 1.82 : 1;
+  const expensePct = Math.min((monthlyExpenses / expenseTarget) * 100, 100);
+
+  // ─── UI ─────────────────────────────────────────────
+
+  const handleCreated = (tx: any) => {
+    setTransactions((prev) => [tx, ...prev]);
+    setIsModalOpen(false);
+  };
 
   return (
     <>
       <AppLayout title="Dashboard" activePage="dashboard">
+
         <div className="dash-content">
 
-          {/* STAT CARDS */}
+          {/* ── STAT CARDS ── */}
           <div className="dash-stats">
 
             {/* Total Balance */}
             <div className="stat-card stat-card--blue">
               <div className="stat-card-top">
                 <p className="stat-card-label">TOTAL AVAILABLE BALANCE</p>
-                <span className="stat-card-icon">🪙</span>
+                <span className="stat-card-icon">💳</span>
               </div>
               <p className="stat-card-value">
-                {loading ? "Loading..." : `$${totalBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                {loading ? "Loading..." : formatCurrency(totalBalance)}
               </p>
-              <p className="stat-card-change positive">↗ +12.5% from last month</p>
+              <p className="stat-card-change positive">↑ +12.5% from last month</p>
             </div>
 
             {/* Monthly Income */}
             <div className="stat-card stat-card--dark">
               <div className="stat-card-top">
                 <p className="stat-card-label">Monthly Income</p>
-                <span className="stat-change-icon green">↑</span>
+                <span className="stat-change-icon green">↓</span>
               </div>
-              <p className="stat-card-value">
-                {loading ? "Loading..." : `$${monthlyIncome.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-              </p>
+              <p className="stat-card-value">{formatCurrency(monthlyIncome)}</p>
               <div className="stat-progress-bar">
-                <div className="stat-progress-fill green" style={{ width: `${incomePct}%` }}></div>
+                <div
+                  className="stat-progress-fill green"
+                  style={{ width: `${incomePct}%` }}
+                />
               </div>
-              <p className="stat-card-meta">{incomePct}% of monthly target reached</p>
+              <p className="stat-card-meta">{incomePct.toFixed(0)}% of monthly target reached</p>
             </div>
 
             {/* Monthly Expenses */}
             <div className="stat-card stat-card--dark">
               <div className="stat-card-top">
                 <p className="stat-card-label">Monthly Expenses</p>
-                <span className="stat-change-icon blue">↓</span>
+                <span className="stat-change-icon blue">↑</span>
               </div>
-              <p className="stat-card-value">
-                {loading ? "Loading..." : `$${monthlyExpenses.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-              </p>
+              <p className="stat-card-value">{formatCurrency(monthlyExpenses)}</p>
               <div className="stat-progress-bar">
-                <div className="stat-progress-fill blue" style={{ width: `${expensePct}%` }}></div>
+                <div
+                  className="stat-progress-fill blue"
+                  style={{ width: `${expensePct}%` }}
+                />
               </div>
-              <p className="stat-card-meta">{expensePct}% of budget consumed</p>
+              <p className="stat-card-meta">{expensePct.toFixed(0)}% of budget consumed</p>
             </div>
 
           </div>
 
-          {/* INCOME VS EXPENSES CHART */}
+          {/* ── CHART ── */}
           <div className="dash-card">
             <div className="chart-header">
               <div>
-                <h3 className="chart-title">Income vs Expenses</h3>
+                <p className="chart-title">Income vs Expenses</p>
                 <p className="chart-subtitle">Weekly performance overview</p>
               </div>
               <div className="chart-toggle">
                 <button
-                  className={`toggle-btn ${period === "weekly" ? "active" : ""}`}
-                  onClick={() => setPeriod("weekly")}
+                  className={`toggle-btn${chartView === "weekly" ? " active" : ""}`}
+                  onClick={() => setChartView("weekly")}
                 >
                   Weekly
                 </button>
                 <button
-                  className={`toggle-btn ${period === "monthly" ? "active" : ""}`}
-                  onClick={() => setPeriod("monthly")}
+                  className={`toggle-btn${chartView === "monthly" ? " active" : ""}`}
+                  onClick={() => setChartView("monthly")}
                 >
                   Monthly
                 </button>
@@ -205,109 +245,113 @@ export default function DashboardPage() {
             </div>
 
             <div className="bar-chart">
-              {data.map((val, i) => (
+              {chartData.labels.map((label, i) => (
                 <div key={i} className="bar-group">
                   <div className="bar-col">
                     <div
                       className="bar bar--income"
-                      style={{ height: `${(val / maxVal) * 180}px` }}
-                    ></div>
+                      style={{ height: `${(chartData.income[i] / maxVal) * 180}px` }}
+                      title={`Income: ${formatCurrency(chartData.income[i])}`}
+                    />
                     <div
                       className="bar bar--expense"
-                      style={{ height: `${(val * 0.6 / maxVal) * 180}px` }}
-                    ></div>
+                      style={{ height: `${(chartData.expense[i] / maxVal) * 180}px` }}
+                      title={`Expense: ${formatCurrency(chartData.expense[i])}`}
+                    />
                   </div>
-                  <p className="bar-label">{months[i]}</p>
+                  <p className="bar-label">{label}</p>
                 </div>
               ))}
             </div>
+
+            {/* Legend */}
+            <div className="chart-legend">
+              <span className="legend-dot legend-dot--income" />
+              <span className="legend-label">Income</span>
+              <span className="legend-dot legend-dot--expense" />
+              <span className="legend-label">Expenses</span>
+            </div>
           </div>
 
-          {/* QUICK ACTIONS + SAVINGS GOAL */}
+          {/* ── QUICK ACTIONS + SAVINGS ROW ── */}
           <div className="dash-row">
 
             {/* Quick Actions */}
             <div className="dash-card quick-actions-card">
-              <h3 className="quick-actions-title">Quick Actions</h3>
+              <p className="quick-actions-title">Quick Actions</p>
               <div className="quick-actions-grid">
                 <button
                   className="quick-action-btn"
                   onClick={() => { setModalType("income"); setIsModalOpen(true); }}
                 >
-                  <span className="quick-action-icon">⊕</span>
+                  <span className="quick-action-icon">＋</span>
                   Add Income
                 </button>
                 <button
                   className="quick-action-btn quick-action-btn--expense"
                   onClick={() => { setModalType("expense"); setIsModalOpen(true); }}
                 >
-                  <span className="quick-action-icon">⊖</span>
+                  <span className="quick-action-icon">－</span>
                   Add Expenses
                 </button>
               </div>
             </div>
 
             {/* Savings Goal */}
-            <div className="dash-card savings-goal-card">
+            <div className="dash-card">
               <div className="savings-goal-header">
                 <div>
-                  <h3 className="savings-goal-title">Savings Goal</h3>
+                  <p className="savings-goal-title">Savings Goal</p>
                   <p className="savings-goal-name">
-                    {loading ? "Loading..." : goalName}
+                    {savingsGoal?.name ?? "New Home Fund"}
                   </p>
                 </div>
                 <span className="savings-goal-badge">
-                  {loading ? "..." : `${goalPct}% COMPLETE`}
+                  {goalPct.toFixed(0)}% COMPLETE
                 </span>
               </div>
-              <h4 className="savings-goal-progress-label">Progress</h4>
+              <p className="savings-goal-progress-label">Progress</p>
               <div className="savings-goal-bar">
                 <div
                   className="savings-goal-fill"
-                  style={{ width: loading ? "0%" : `${goalPct}%` }}
-                ></div>
+                  style={{ width: `${goalPct}%` }}
+                />
               </div>
+              <p className="stat-card-meta" style={{ marginTop: 10 }}>
+                {formatCurrency(goalSaved)} of {formatCurrency(goalTarget)} saved
+              </p>
             </div>
 
           </div>
 
-          {/* RECENT TRANSACTIONS */}
+          {/* ── RECENT TRANSACTIONS ── */}
           <div className="dash-card">
             <div className="tx-header">
-              <h3 className="tx-title">Recent Transactions</h3>
+              <p className="tx-title">Recent Transactions</p>
               <button className="tx-view-all">View All History</button>
             </div>
 
-            {loading ? (
-              <p style={{ color: "#9ca3af", fontSize: "14px", padding: "1rem 0" }}>
-                Loading transactions...
-              </p>
-            ) : (
-              <div className="tx-list">
-                {transactions.slice(0, 8).map((tx: any, index: number) => {
-                  const amount = tx.amount ?? 0;
-                  const isCredit = tx.type === "income" || amount > 0;
-                  const icon = tx.icon ?? getTxIcon(tx);
-                  const name = tx.description ?? tx.name ?? "Transaction";
-                  const date = tx.icon ? tx.date : formatDate(tx.date ?? tx.createdAt);
-
-                  return (
-                    <div key={tx.id ?? tx._id ?? index} className="tx-row">
-                      <div className="tx-icon-wrap">{icon}</div>
-                      <div className="tx-info">
-                        <p className="tx-name">{name}</p>
-                        <p className="tx-date">{date}</p>
-                      </div>
-                      <p className={`tx-amount ${isCredit ? "credit" : "debit"}`}>
-                        {isCredit
-                          ? `+${formatCurrency(amount)}`
-                          : `-${formatCurrency(amount)}`}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            <div className="tx-list">
+              {transactions.slice(0, 8).map((tx, i) => (
+                <div key={i} className="tx-row">
+                  <div className="tx-icon-wrap" aria-hidden="true">
+                    {getTxIcon(tx)}
+                  </div>
+                  <div className="tx-info">
+                    <p className="tx-name">{tx.description}</p>
+                    <p className="tx-date">
+                      {formatDateTime(tx.date ?? tx.createdAt).toUpperCase()}
+                    </p>
+                  </div>
+                  <span
+                    className={`tx-amount ${tx.type === "income" ? "credit" : "debit"}`}
+                  >
+                    {tx.type === "income" ? "+" : "-"}
+                    {formatCurrency(tx.amount)}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
 
         </div>
@@ -317,10 +361,7 @@ export default function DashboardPage() {
         <NewTransactionModal
           onClose={() => setIsModalOpen(false)}
           defaultType={modalType}
-          onTransactionCreated={async () => {
-            setIsModalOpen(false);
-            await fetchDashboardData();
-          }}
+          onTransactionCreated={handleCreated}
         />
       )}
     </>

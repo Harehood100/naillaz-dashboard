@@ -85,7 +85,6 @@ export default function CreateGoalModal({
       const newGoal = {
         goalType: selectedGoal,
         goalName,
-        title: goalName, // backend expects `title`
         targetAmount,
         targetDate,
         monthlyContribution,
