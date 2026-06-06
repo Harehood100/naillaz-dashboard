@@ -22,4 +22,8 @@ export const getTransactions = async () => {
   const response = await api.get("/expenses");
   return response.data;
 };
+export const getAllTransactions = async () => {
+  const response = await api.get("/transactions");
+  return response.data;
+};
 
