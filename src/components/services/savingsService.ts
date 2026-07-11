@@ -1,30 +1,20 @@
-// src/components/services/savingsService.ts
-import api from "@/utils/api";
-import type { GoalFormData } from "@/components/savingsGoals/CreateGoalModal";
+import { mockSavings } from '@/lib/mockData'
 
-export type SavingsGoal = GoalFormData & {
-  _id: string;
-  createdAt: string;
-  title?: string;
-  currentAmount?: number;
-};
-
-export async function getSavingsGoals(): Promise<SavingsGoal[]> {
-  console.log("token:", localStorage.getItem("token"));
-  const res = await api.get<SavingsGoal[]>("/savings/history");
-  console.log("goals response:", res.data);
-  return res.data;
+export const getSavingsGoals = async () => {
+  return mockSavings
 }
 
+export const createSavingsGoal = async (data: any) => {
+  console.log('Savings goal created:', data)
+  return { success: true, data }
+}
 
+export const updateSavingsGoal = async (id: string, data: any) => {
+  console.log('Savings goal updated:', id, data)
+  return { success: true, data }
+}
 
-export async function createSavingsGoal(goal: GoalFormData): Promise<SavingsGoal> {
-  const payload = {
-    name: goal.goalName,
-    category: goal.goalType,
-    targetAmount: Number(goal.targetAmount),
-  };
-
-  const res = await api.post<SavingsGoal>("/savings", payload);
-  return res.data;
+export const deleteSavingsGoal = async (id: string) => {
+  console.log('Savings goal deleted:', id)
+  return { success: true }
 }

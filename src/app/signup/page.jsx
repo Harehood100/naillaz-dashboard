@@ -59,42 +59,40 @@ export default function SignupPage() {
     setServerError("");
 
     try {
-    await api.post("/auth/signup", {
-        name: `${firstName.trim()} ${lastName.trim()}`.trim(),
-        email,
-        password,
-      });
+      setLoading(true)
 
-      // Store email for the verify page, then navigate
-      sessionStorage.setItem("pendingVerificationEmail", email);
-      router.push("/dashboard");
+      // Mock signup — works without backend
+      localStorage.setItem('token', 'mock-token-12345')
+      localStorage.setItem('user', JSON.stringify({
+        firstName: firstName,
+        lastName: lastName,
+        email: email
+      }))
+
+      window.location.href = '/dashboard'
+
     } catch (error) {
-      console.error("Signup error:", error);
-      const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Signup failed. Make sure your backend server is active.";
-      setServerError(message);
+      setErrors({ general: 'Something went wrong. Please try again.' })
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   };
 
-  
 
 
-      const getPasswordStrength = (password) => {
-      let score = 0;
 
-      if (password.length >= 8) score++;
-      if (/[A-Z]/.test(password)) score++;
-      if (/[0-9]/.test(password)) score++;
-      if (/[^A-Za-z0-9]/.test(password)) score++;
+  const getPasswordStrength = (password) => {
+    let score = 0;
 
-      return score;
-    };
+    if (password.length >= 8) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
 
-   const strength = getPasswordStrength(password);
+    return score;
+  };
+
+  const strength = getPasswordStrength(password);
 
 
 
@@ -112,14 +110,14 @@ export default function SignupPage() {
 
           <div className="left-content">
             <h1>Your money {" "}
-               <span style={{ color: "#f5a017" }}>
+              <span style={{ color: "#f5a017" }}>
                 tracked & grown
-               </span>{" "}
-              
-               with clarity.
+              </span>{" "}
+
+              with clarity.
 
             </h1>
-            
+
             <p>
               Join over 2,500 businesses. Setup takes less than 2 minutes.
             </p>
@@ -152,164 +150,161 @@ export default function SignupPage() {
         {/* RIGHT SECTION */}
         <div className="signup-right">
           <div className="form-card">
-            <form onSubmit={handleSubmit}> 
-            <h1>Create Account</h1>
+            <form onSubmit={handleSubmit}>
+              <h1>Create Account</h1>
 
-            <p>Set up your free Financial Workspace</p>
+              <p>Set up your free Financial Workspace</p>
 
-            <div className="name-fields">
-              <div>
-                <label>FIRST NAME</label>
-               <input
-                type="text"
-                 value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+              <div className="name-fields">
+                <div>
+                  <label>FIRST NAME</label>
+                  <input
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                   />
-                {errors.firstName && <p className="error-text">{errors.firstName}</p>}
+                  {errors.firstName && <p className="error-text">{errors.firstName}</p>}
+                </div>
+
+                <div>
+                  <label>LAST NAME</label>
+                  <input
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                  {errors.lastName && <p className="error-text">{errors.lastName}</p>}
+                </div>
               </div>
 
-              <div>
-                <label>LAST NAME</label>
+              <label>BUSINESS EMAIL</label>
+              <div className="input-wrapper">
+                <Mail size={18} className="input-icon" />
                 <input
-                  type="text"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                  type="email"
+                  placeholder="name@company.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
-                {errors.lastName && <p className="error-text">{errors.lastName}</p>}
+                {errors.email && <p className="error-text">{errors.email}</p>}
               </div>
-            </div>
 
-            <label>BUSINESS EMAIL</label>
-            <div className="input-wrapper">
-              <Mail size={18} className="input-icon" />
-              <input
-               type="email"
-               placeholder="name@company.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              />
-              {errors.email && <p className="error-text">{errors.email}</p>}
-            </div>
-
-            <label>PASSWORD</label>
-            <div className="input-wrapper">
-              <Lock size={18} className="input-icon" />
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+              <label>PASSWORD</label>
+              <div className="input-wrapper">
+                <Lock size={18} className="input-icon" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
-              {errors.password && <p className="error-text">{errors.password}</p>}
-              <button
-                type="button"
-                className="eye-btn"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
+                {errors.password && <p className="error-text">{errors.password}</p>}
+                <button
+                  type="button"
+                  className="eye-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
 
-            <div className="password-strength">
+              <div className="password-strength">
                 <div
-                  className={`strength-bar ${
-                    strength >= 1 ? "strength-red" : ""
-                  }`}
+                  className={`strength-bar ${strength >= 1 ? "strength-red" : ""
+                    }`}
                 ></div>
 
                 <div
-                  className={`strength-bar ${
-                    strength >= 2 ? "strength-yellow" : ""
-                  }`}
+                  className={`strength-bar ${strength >= 2 ? "strength-yellow" : ""
+                    }`}
                 ></div>
 
                 <div
-                  className={`strength-bar ${
-                    strength >= 3 ? "strength-green" : ""
-                  }`}
+                  className={`strength-bar ${strength >= 3 ? "strength-green" : ""
+                    }`}
                 ></div>
               </div>
 
-           <small className="strength-text">
-          {strength <= 1 &&
-            "Weak password - add uppercase letters, numbers, or symbols"}
+              <small className="strength-text">
+                {strength <= 1 &&
+                  "Weak password - add uppercase letters, numbers, or symbols"}
 
-          {strength === 2 &&
-            "Medium strength - add a symbol or number"}
+                {strength === 2 &&
+                  "Medium strength - add a symbol or number"}
 
-          {strength >= 3 &&
-            "Strong password"}
-        </small>
+                {strength >= 3 &&
+                  "Strong password"}
+              </small>
 
-            <label>CONFIRM PASSWORD</label>
-            <div className="input-wrapper">
-              <Lock size={18} className="input-icon" />
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                 placeholder="••••••••"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+              <label>CONFIRM PASSWORD</label>
+              <div className="input-wrapper">
+                <Lock size={18} className="input-icon" />
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                 />
-              {errors.confirmPassword && <p className="error-text">{errors.confirmPassword}</p>}
+                {errors.confirmPassword && <p className="error-text">{errors.confirmPassword}</p>}
+                <button
+                  type="button"
+                  className="eye-btn"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+
+              <div className="terms">
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                />
+                {errors.agreed && <p className="error-text">{errors.agreed}</p>}
+                <p>
+                  I agree to the <span>Terms of service</span>{" "}
+                  and <span>Privacy Policy</span>
+                </p>
+              </div>
+
+              {serverError && (
+                <p className="error-text">
+                  {serverError}
+                </p>
+              )}
+
               <button
-                type="button"
-                className="eye-btn"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                type="submit"
+                className="continue-btn"
+                disabled={loading}
               >
-                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {loading ? "Creating Account..." : "Continue"}
               </button>
-            </div>
-
-            <div className="terms">
-              <input
-                type="checkbox"
-                checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
-                />
-              {errors.agreed && <p className="error-text">{errors.agreed}</p>}
-              <p>
-                I agree to the <span>Terms of service</span>{" "}
-                and <span>Privacy Policy</span>
-              </p>
-            </div>
-
-            {serverError && (
-              <p className="error-text">
-                {serverError}
-              </p>
-            )}
-
-           <button
-            type="submit"
-            className="continue-btn"
-            disabled={loading}
-          >
-            {loading ? "Creating Account..." : "Continue"}
-          </button>
 
 
-            <div className="divider">
-              <span></span>
-              <p>or</p>
-              <span></span>
-            </div>
+              <div className="divider">
+                <span></span>
+                <p>or</p>
+                <span></span>
+              </div>
 
-           <Link href="/auth/google">
-          <button type="button" className="google-btn">
-            Sign up with Google
-          </button>
-        </Link>
+              <Link href="/auth/google">
+                <button type="button" className="google-btn">
+                  Sign up with Google
+                </button>
+              </Link>
 
-           <div className="login-link">
-          Already have an account?{" "}
-          <Link href="/login">
-            <span>Log in</span>
-          </Link>
-        </div>
-              
-            </form>  
-            </div>  
+              <div className="login-link">
+                Already have an account?{" "}
+                <Link href="/login">
+                  <span>Log in</span>
+                </Link>
+              </div>
+
+            </form>
           </div>
+        </div>
 
       </div> {/* end .signup-content */}
 

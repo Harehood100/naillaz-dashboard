@@ -38,21 +38,22 @@ export default function LoginPage() {
     if (Object.keys(newErrors).length > 0) return;
 
     try {
-      setLoading(true);
-      const res = await api.post("/auth/login", { email, password });
-      const data = res.data; // ✅ axios: no `await` needed, and it's res.data not res.data()
+      setLoading(true)
 
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-      }
+      // Mock login — works without backend
+      localStorage.setItem('token', 'mock-token-12345')
+      localStorage.setItem('user', JSON.stringify({
+        firstName: 'Bolaji',
+        lastName: 'Bakare',
+        email: email
+      }))
 
-      router.push("/dashboard");
-    } catch (err) {
-      // Axios throws on 4xx/5xx — extract message from response if available
-      const message = err.response?.data?.message ?? "Invalid email or password.";
-      setApiError(message);
+      window.location.href = '/dashboard'
+
+    } catch (error) {
+      setErrors({ general: 'Something went wrong. Please try again.' })
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   };
 

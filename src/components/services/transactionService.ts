@@ -1,46 +1,21 @@
-import api from "@/utils/api";
+import { mockTransactions } from '@/lib/mockData'
 
-const STORAGE_KEY = "demo_transactions";
+export const getTransactions = async () => {
+  // Return mock data — no backend needed
+  return mockTransactions
+}
 
-// ─── LOCAL HELPERS ───────────────────────────────
-const getLocal = () =>
-  typeof window !== "undefined"
-    ? JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")
-    : [];
+export const createTransaction = async (data: any) => {
+  console.log('Transaction created:', data)
+  return { success: true, data }
+}
 
-const saveLocal = (data: any[]) =>
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+export const updateTransaction = async (id: string, data: any) => {
+  console.log('Transaction updated:', id, data)
+  return { success: true, data }
+}
 
-// ─── TRANSACTIONS ONLY (SAFE ISOLATION) ──────────
-export const createTransaction = async (payload: any) => {
-  // demo fallback ONLY for transactions
-  const newTx = {
-    ...payload,
-    _id: Date.now().toString(),
-    createdAt: new Date().toISOString(),
-  };
-
-  const existing = getLocal();
-  const updated = [newTx, ...existing];
-
-  saveLocal(updated);
-
-  return newTx;
-};
-
-export const getAllTransactions = async () => {
-  // try backend first
-  try {
-    const res = await api.get("/transactions");
-    const data = res?.data?.data;
-
-    if (Array.isArray(data) && data.length > 0) {
-      return data;
-    }
-  } catch (err) {
-    console.log("Backend failed, using demo mode");
-  }
-
-  // fallback ONLY for transactions
-  return getLocal();
-};
+export const deleteTransaction = async (id: string) => {
+  console.log('Transaction deleted:', id)
+  return { success: true }
+}
