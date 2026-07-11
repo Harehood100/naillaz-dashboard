@@ -6,7 +6,7 @@ import NewTransactionModal, {
   TransactionData,
 } from "@/components/transactions/NewTransactionModal";
 import "./expenses.css";
-import { getAllTransactions } from "@/components/services/transactionService";
+import { getTransactions } from "@/components/services/transactionService";
 
 // ─── TYPES ───────────────────────────────────────────────
 
@@ -204,9 +204,9 @@ export default function ExpensesPage() {
     const load = async () => {
       try {
         setLoading(true);
-        const res = await getAllTransactions();
-        const data = Array.isArray(res) ? res : res?.data?.data || res?.data || [];
-        setAllTransactions(Array.isArray(data) ? data : []);
+        const data = await getTransactions()
+        const expenses = data.filter((tx: any) => tx.type === 'expense')
+        setAllTransactions(expenses);
       } catch (err) {
         console.error("Expense load error:", err);
         setAllTransactions([]);

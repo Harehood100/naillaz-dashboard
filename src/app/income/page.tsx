@@ -7,7 +7,7 @@ import NewTransactionModal from "@/components/transactions/NewTransactionModal";
 import RevenueMixChart from "@/components/income/RevenueMixChart";
 import "./income.css";
 
-import { getAllTransactions } from "@/components/services/transactionService";
+import { getTransactions } from "@/components/services/transactionService";
 
 // ─── Helpers ─────────────────────────────────────────────
 
@@ -56,7 +56,7 @@ export default function IncomePage() {
     const load = async () => {
       try {
         setLoading(true);
-        const res = await getAllTransactions();
+        const res = await getTransactions();
         const list = Array.isArray(res) ? res : [];
         setTransactions(list);
       } catch (err) {
@@ -191,7 +191,7 @@ export default function IncomePage() {
 
           {/* ── TRANSACTIONS TABLE ── */}
           <div className="income-table-card">
-            <div className="table-header-row">  
+            <div className="table-header-row">
             </div>
 
             {loading ? (

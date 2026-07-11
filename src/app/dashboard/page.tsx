@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import NewTransactionModal from "@/components/transactions/NewTransactionModal";
-import { getAllTransactions } from "@/components/services/transactionService";
+import { getTransactions } from '@/components/services/transactionService'
 import { getSavingsGoals } from "@/components/services/savingsService";
 import "./dashboard.css";
 
@@ -111,7 +111,7 @@ export default function DashboardPage() {
       setLoading(true);
 
       const [txRes, savingsRes] = await Promise.all([
-        getAllTransactions(),
+        getTransactions(),
         getSavingsGoals(),
       ]);
 
