@@ -6,7 +6,7 @@ import NewTransactionModal, {
   TransactionData,
 } from "@/components/transactions/NewTransactionModal";
 import "./expenses.css";
-import { getTransactions } from "@/components/services/transactionService";
+import { mockTransactions } from "@/lib/mockData";
 
 // ─── TYPES ───────────────────────────────────────────────
 
@@ -27,6 +27,8 @@ const CATEGORY_COLORS: Record<string, string> = {
   Health: "#10b981",
   Shopping: "#f43f5e",
   Education: "#84cc16",
+  Software: "#a855f7",
+  Sales: "#22c55e",
   Other: "#94a3b8",
 };
 
@@ -39,12 +41,12 @@ const CATEGORY_LIMIT_PCT: Record<string, number> = {
   Health: 0.08,
   Shopping: 0.08,
   Education: 0.05,
+  Software: 0.07,
   Other: 0.05,
 };
 
 const WEEK_LABELS = ["WK 1", "WK 2", "WK 3", "WK 4"];
 
-// category → icon emoji
 const CATEGORY_ICONS: Record<string, string> = {
   Food: "🍔",
   Rent: "🏠",
@@ -54,6 +56,8 @@ const CATEGORY_ICONS: Record<string, string> = {
   Health: "💊",
   Shopping: "🛍️",
   Education: "📚",
+  Software: "💻",
+  Sales: "💰",
   Other: "💳",
 };
 
@@ -81,12 +85,6 @@ function getTransactionDate(t: any): Date | null {
   return isNaN(d.getTime()) ? null : d;
 }
 
-function isSameMonth(t: any, year: number, month: number): boolean {
-  const d = getTransactionDate(t);
-  if (!d) return false;
-  return d.getFullYear() === year && d.getMonth() === month;
-}
-
 function formatDateTime(t: any): string {
   const d = getTransactionDate(t);
   if (!d) return "";
@@ -101,7 +99,7 @@ function formatDateTime(t: any): string {
     .toUpperCase();
 }
 
-function buildWeeklyTotals(transactions: TransactionData[]) {
+function buildWeeklyTotals(transactions: any[]) {
   const weekly = [0, 0, 0, 0];
   transactions.forEach((t) => {
     const d = getTransactionDate(t);
@@ -114,11 +112,7 @@ function buildWeeklyTotals(transactions: TransactionData[]) {
 
 // ─── SPENDING TREND BAR CHART ────────────────────────────
 
-function SpendingTrendChart({
-  weeklyTotals,
-}: {
-  weeklyTotals: number[];
-}) {
+function SpendingTrendChart({ weeklyTotals }: { weeklyTotals: number[] }) {
   const maxWeek = Math.max(...weeklyTotals, 1);
   const maxBarHeight = 90;
 
@@ -129,7 +123,7 @@ function SpendingTrendChart({
         return (
           <div key={i} className="trend-bar-col">
             <span className="trend-bar-value">
-              {v > 0 ? `$${(v / 1000).toFixed(0)}k` : ""}
+              {v > 0 ? `$${(v / 1000).toFixed(1)}k` : ""}
             </span>
             <div
               className={`trend-bar${isMax ? " trend-bar--peak" : ""}`}
@@ -190,31 +184,28 @@ function PieChart({ categories }: { categories: CategoryStat[] }) {
 
 export default function ExpensesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [allTransactions, setAllTransactions] = useState<TransactionData[]>([]);
+  const [allTransactions, setAllTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
 
-  const monthLabel = now.toLocaleString("en-US", { month: "long", year: "numeric" });
-
-  // ─── FETCH ─────────────────────────────────────────────
+  // ─── LOAD MOCK DATA ────────────────────────────────────
   useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true);
-        const data = await getTransactions()
-        const expenses = data.filter((tx: any) => tx.type === 'expense')
-        setAllTransactions(expenses);
-      } catch (err) {
-        console.error("Expense load error:", err);
-        setAllTransactions([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+    try {
+      setLoading(true);
+      // Use mock data directly — filter expenses only
+      const expenses = mockTransactions.filter(
+        (tx) => tx.type === "expense"
+      );
+      setAllTransactions(expenses);
+    } catch (err) {
+      console.error("Expense load error:", err);
+      setAllTransactions([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const handleTransactionCreated = (tx: TransactionData) => {
@@ -222,23 +213,18 @@ export default function ExpensesPage() {
     setIsModalOpen(false);
   };
 
-  // ─── FILTERS ───────────────────────────────────────────
+  // ─── ALL EXPENSES (no month filter — mock data is current) ─
   const expenseTransactions = useMemo(
-    () => allTransactions.filter((t) => t.type === "expense" && isSameMonth(t, year, month)),
-    [allTransactions, year, month]
-  );
-
-  const incomeThisMonth = useMemo(
-    () =>
-      allTransactions
-        .filter((t) => t.type === "income" && isSameMonth(t, year, month))
-        .reduce((s, t) => s + Number(t.amount ?? 0), 0),
-    [allTransactions, year, month]
+    () => allTransactions,
+    [allTransactions]
   );
 
   // ─── TOTALS ────────────────────────────────────────────
-  const spent = expenseTransactions.reduce((s, t) => s + Number(t.amount ?? 0), 0);
-  const budget = incomeThisMonth || spent * 1.03 || 1;
+  const spent = expenseTransactions.reduce(
+    (s, t) => s + Number(t.amount ?? 0),
+    0
+  );
+  const budget = spent * 1.3 || 1000;
   const progress = Math.min((spent / budget) * 100, 100);
   const remaining = budget - spent;
 
@@ -262,7 +248,6 @@ export default function ExpensesPage() {
   const totalCatSpend = categoryStats.reduce((s, c) => s + c.amount, 0);
   const topCategory = categoryStats[0];
 
-  // Spending limits per category based on budget
   const limitsData = useMemo(() => {
     return categoryStats.slice(0, 4).map((cat) => {
       const limitAmt = budget * (CATEGORY_LIMIT_PCT[cat.name] ?? 0.05);
@@ -283,10 +268,13 @@ export default function ExpensesPage() {
       <AppLayout title="Expense Analytics" activePage="expenses">
         <div className="expenses-content">
 
-          {/* ── HEADER ── */}
+          {/* HEADER */}
           <div className="expenses-header">
             <p className="expenses-subtitle">Track and manage your spendings</p>
-            <button className="add-expense-btn" onClick={() => setIsModalOpen(true)}>
+            <button
+              className="add-expense-btn"
+              onClick={() => setIsModalOpen(true)}
+            >
               + Add Expenses
             </button>
           </div>
@@ -296,31 +284,32 @@ export default function ExpensesPage() {
           ) : (
             <div className="expenses-grid">
 
-              {/* ══ LEFT: Budget Progress + Recent Expenses ══ */}
+              {/* LEFT COLUMN */}
               <div className="expenses-col expenses-col--left">
 
                 {/* Budget Progress */}
                 <div className="budget-card">
-                  <p className="budget-label">
-                    MONTHLY BUDGET PROGRESS
-                  </p>
+                  <p className="budget-label">MONTHLY BUDGET PROGRESS</p>
                   <div className="budget-amount">
                     <span className="budget-current">${spent.toLocaleString()}</span>
                     <span className="budget-sep"> / </span>
-                    <span className="budget-total">${budget.toLocaleString()}</span>
+                    <span className="budget-total">${Math.round(budget).toLocaleString()}</span>
                   </div>
                   <div className="budget-bar-track">
                     <div
-                      className={`budget-bar-fill${progress >= 100 ? " danger" : progress >= 80 ? " warning" : ""}`}
+                      className={`budget-bar-fill${progress >= 100 ? " danger" : progress >= 80 ? " warning" : ""
+                        }`}
                       style={{ width: `${progress}%` }}
                     />
                   </div>
                   <div className="budget-footer">
-                    <span className="budget-pct">{progress.toFixed(1)}% of monthly limit</span>
+                    <span className="budget-pct">
+                      {progress.toFixed(1)}% of monthly limit
+                    </span>
                     <span className={`budget-remaining${remaining < 0 ? " over" : ""}`}>
                       {remaining >= 0
-                        ? `$${remaining.toLocaleString()} remaining`
-                        : `$${Math.abs(remaining).toLocaleString()} over`}
+                        ? `$${remaining.toLocaleString(undefined, { maximumFractionDigits: 0 })} remaining`
+                        : `$${Math.abs(remaining).toLocaleString(undefined, { maximumFractionDigits: 0 })} over`}
                     </span>
                   </div>
                 </div>
@@ -333,22 +322,28 @@ export default function ExpensesPage() {
                   </div>
                   <div className="re-list">
                     {expenseTransactions.length === 0 ? (
-                      <p className="re-empty">No expenses this month.</p>
+                      <p className="re-empty">No expenses found.</p>
                     ) : (
                       expenseTransactions.slice(0, 8).map((t, i) => (
                         <div key={i} className="re-item">
                           <div
                             className="re-icon-wrap"
-                            style={{ background: colorFor(t.category ?? "Other") + "22" }}
+                            style={{
+                              background: colorFor(t.category ?? "Other") + "22",
+                            }}
                           >
-                            <span className="re-icon">{iconFor(t.category ?? "Other")}</span>
+                            <span className="re-icon">
+                              {iconFor(t.category ?? "Other")}
+                            </span>
                           </div>
                           <div className="re-info">
-                            <p className="re-name">{t.description ?? t.category}</p>
+                            <p className="re-name">
+                              {t.description ?? t.category}
+                            </p>
                             <p className="re-date">{formatDateTime(t)}</p>
                           </div>
                           <span className="re-amount">
-                            - ${Number(t.amount).toLocaleString()}
+                            -${Number(t.amount).toLocaleString()}
                           </span>
                         </div>
                       ))
@@ -358,18 +353,13 @@ export default function ExpensesPage() {
 
               </div>
 
-              {/* ══ RIGHT: Trend + Limits + Category ══ */}
+              {/* RIGHT COLUMN */}
               <div className="expenses-col expenses-col--right">
 
                 {/* Spending Trend */}
                 <div className="trend-card">
                   <p className="trend-title">Spending Trend</p>
                   <SpendingTrendChart weeklyTotals={weeklyTotals} />
-                </div>
-
-                {/* Recent Expenses label (right side) */}
-                <div className="right-section-label">
-                  <p className="section-label-text">Recent Expenses</p>
                 </div>
 
                 {/* Spending Limits */}
@@ -407,10 +397,14 @@ export default function ExpensesPage() {
                     <div className="category-info">
                       {topCategory ? (
                         <>
-                          <p className="category-name">{topCategory.name} dominates</p>
+                          <p className="category-name">
+                            {topCategory.name} dominates
+                          </p>
                           <p className="category-sub">
                             {totalCatSpend > 0
-                              ? `${Math.round((topCategory.amount / totalCatSpend) * 100)}% of total spend`
+                              ? `${Math.round(
+                                (topCategory.amount / totalCatSpend) * 100
+                              )}% of total spend`
                               : "—"}
                           </p>
                         </>
@@ -419,6 +413,25 @@ export default function ExpensesPage() {
                       )}
                     </div>
                   </div>
+
+                  {/* Category list */}
+                  <div className="category-list">
+                    {categoryStats.map((cat, i) => (
+                      <div key={i} className="category-list-item">
+                        <div className="category-list-left">
+                          <div
+                            className="category-dot"
+                            style={{ background: cat.color }}
+                          />
+                          <span className="category-list-name">{cat.name}</span>
+                        </div>
+                        <span className="category-list-amount">
+                          ${cat.amount.toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
                 </div>
 
               </div>

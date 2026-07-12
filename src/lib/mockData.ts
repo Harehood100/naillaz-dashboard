@@ -14,14 +14,24 @@ export const mockSummary = {
 }
 
 export const mockTransactions = [
-    { id: 1, description: "Amazon Web Service", category: "Software", date: "2026-06-24", amount: -156.00, type: "expense" },
-    { id: 2, description: "The Bistro Downtown", category: "Dining", date: "2026-06-24", amount: -42.50, type: "expense" },
-    { id: 3, description: "Direct Sales - POS", category: "Sales", date: "2026-06-23", amount: 3150.25, type: "income" },
-    { id: 4, description: "Lufthansa Airlines", category: "Transport", date: "2026-06-22", amount: -840.00, type: "expense" },
-    { id: 5, description: "Dividend Payout ETF", category: "Investment", date: "2026-06-21", amount: 420.00, type: "income" },
-    { id: 6, description: "Lamina Creatives", category: "Freelance", date: "2026-06-20", amount: 3215.00, type: "income" },
-    { id: 7, description: "Blue Bottle Coffee", category: "Dining", date: "2026-06-20", amount: -12.50, type: "expense" },
-    { id: 8, description: "Shell Gasoline", category: "Transport", date: "2026-06-20", amount: -85.20, type: "expense" },
+    // EXPENSES
+    { id: 1, description: "Amazon Web Service", category: "Software", date: "2026-07-01", amount: 156.00, type: "expense" },
+    { id: 2, description: "The Bistro Downtown", category: "Food", date: "2026-07-02", amount: 42.50, type: "expense" },
+    { id: 3, description: "Lufthansa Airlines", category: "Transport", date: "2026-07-05", amount: 840.00, type: "expense" },
+    { id: 4, description: "Blue Bottle Coffee", category: "Food", date: "2026-07-08", amount: 12.50, type: "expense" },
+    { id: 5, description: "Shell Gasoline", category: "Transport", date: "2026-07-10", amount: 85.20, type: "expense" },
+    { id: 6, description: "Netflix Subscription", category: "Entertainment", date: "2026-07-11", amount: 15.99, type: "expense" },
+    { id: 7, description: "Electricity Bill", category: "Utilities", date: "2026-07-03", amount: 120.00, type: "expense" },
+    { id: 8, description: "Gym Membership", category: "Health", date: "2026-07-06", amount: 45.00, type: "expense" },
+    { id: 9, description: "Office Rent", category: "Rent", date: "2026-07-01", amount: 3200.00, type: "expense" },
+    { id: 10, description: "Adobe License", category: "Software", date: "2026-07-04", amount: 54.99, type: "expense" },
+
+    // INCOME
+    { id: 11, description: "Direct Sales - POS", category: "Sales", date: "2026-07-01", amount: 3150.25, type: "income" },
+    { id: 12, description: "Dividend Payout ETF", category: "Investment", date: "2026-07-05", amount: 420.00, type: "income" },
+    { id: 13, description: "Lamina Creatives", category: "Freelance", date: "2026-07-08", amount: 3215.00, type: "income" },
+    { id: 14, description: "Client Retainer", category: "Retainer", date: "2026-07-01", amount: 5000.00, type: "income" },
+    { id: 15, description: "Consulting Fee", category: "Consulting", date: "2026-07-10", amount: 2500.00, type: "income" },
 ]
 
 export const mockSavings = [
@@ -30,17 +40,5 @@ export const mockSavings = [
     { id: 3, name: "New Laptop", currentAmount: 9500, targetAmount: 25000 },
 ]
 
-export const mockExpenses = [
-    { id: 1, description: "Office Rent", category: "Housing", date: "2026-06-01", amount: -3200 },
-    { id: 2, description: "Team Lunch", category: "Dining", date: "2026-06-02", amount: -240 },
-    { id: 3, description: "AWS Services", category: "Software", date: "2026-06-03", amount: -180 },
-    { id: 4, description: "Uber to Client", category: "Transport", date: "2026-06-04", amount: -45 },
-    { id: 5, description: "Adobe License", category: "Software", date: "2026-06-05", amount: -55 },
-]
-
-export const mockIncome = [
-    { id: 1, description: "Client Project - ABC Corp", category: "Freelance", date: "2026-06-01", amount: 8000 },
-    { id: 2, description: "Monthly Retainer", category: "Retainer", date: "2026-06-01", amount: 5000 },
-    { id: 3, description: "Product Sales", category: "Sales", date: "2026-06-03", amount: 3200 },
-    { id: 4, description: "Consulting Fee", category: "Consulting", date: "2026-06-05", amount: 2500 },
-]
+export const mockExpenses = mockTransactions.filter(t => t.type === "expense")
+export const mockIncome = mockTransactions.filter(t => t.type === "income")
