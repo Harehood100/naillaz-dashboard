@@ -2,23 +2,25 @@
 import { useState } from "react";
 import Link from "next/link";
 import "./reset-password.css";
-
 import { Lock } from "lucide-react";
-
 import AuthLogo from "@/components/auth/AuthLogo";
-
 import AuthInput from "@/components/auth/AuthInput";
-
 import AuthCard from "@/components/auth/AuthCard";
+
+type FormErrors = {
+  password?: string;
+  confirmPassword?: string;
+};
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState < FormErrors > ({});
+  const [success, setSuccess] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    let newErrors = {};
+    const newErrors: FormErrors = {};
 
     if (!password) {
       newErrors.password = "Password is required";
@@ -34,7 +36,6 @@ export default function ResetPasswordPage() {
 
     setErrors(newErrors);
 
-    // If no errors — show success and redirect to login
     if (Object.keys(newErrors).length === 0) {
       setSuccess(true);
       setTimeout(() => {
@@ -46,83 +47,58 @@ export default function ResetPasswordPage() {
   return (
     <div className="reset-page">
       <div className="reset-container">
-        {/* LOGO */}
-
         <AuthLogo />
-
-        {/* CARD */}
 
         <AuthCard>
           <form onSubmit={handleSubmit}>
-          <div className="form-header">
-            <h1>Reset password</h1>
+            <div className="form-header">
+              <h1>Reset password</h1>
+              <p>Create a new secure password for your account.</p>
+            </div>
 
-            <p>
-              Create a new secure password for
-              your account.
-            </p>
-          </div>
-
-          {/* PASSWORD */}
-
-         <AuthInput
-          label="NEW PASSWORD"
-            type="password"
-          placeholder="••••••••"
-          icon={<Lock size={18} className="input-icon"/>}
-          password
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          />
-            {errors.password && <p className="error-text">{errors.password}</p>}
-      
-            password
-          
-
-          {/* CONFIRM */}
-
-         <AuthInput
-        label="CONFIRM PASSWORD"
-          type="password"
-        placeholder="••••••••"
-          icon={<Lock size={18} className="input-icon"/>}
-          password
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-          {errors.confirmPassword && <p className="error-text">{errors.confirmPassword}</p>}
-            
-            password
-          
-
-          {/* BUTTON */}
-
-         {success ? (
-           <p style={{ color: "green", marginTop: "1rem" }}>
-            ✅ Password reset successful! Redirecting to login...
-        </p>
-        ) : (
-          <button type="submit" className="primary-btn">
-          Reset password
-          </button>
+            <AuthInput
+              label="NEW PASSWORD"
+              type="password"
+              placeholder="••••••••"
+              icon={<Lock size={18} className="input-icon" />}
+              password
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            {errors.password && (
+              <p className="error-text">{errors.password}</p>
             )}
 
-          {/* LOGIN */}
+            <AuthInput
+              label="CONFIRM PASSWORD"
+              type="password"
+              placeholder="••••••••"
+              icon={<Lock size={18} className="input-icon" />}
+              password
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            {errors.confirmPassword && (
+              <p className="error-text">{errors.confirmPassword}</p>
+            )}
 
-          <div className="back-link">
-            <Link href="/login">
-              Back to login
-            </Link>
-          </div>
-            </form>
+            {success ? (
+              <p style={{ color: "green", marginTop: "1rem" }}>
+                ✅ Password reset successful! Redirecting to login...
+              </p>
+            ) : (
+              <button type="submit" className="primary-btn">
+                Reset password
+              </button>
+            )}
+
+            <div className="back-link">
+              <Link href="/login">Back to login</Link>
+            </div>
+          </form>
         </AuthCard>
 
-        {/* FOOTER */}
-
-        <footer>
-          ©2026 Naillaz Financial Corp.
-          All rights reserved.
-        </footer>
+        <footer>©2026 Naillaz Financial Corp. All rights reserved.</footer>
       </div>
     </div>
   );
