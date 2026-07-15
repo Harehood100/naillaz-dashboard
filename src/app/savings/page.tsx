@@ -1,4 +1,3 @@
-// src/app/savings/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,8 +5,10 @@ import AppLayout from "@/components/layout/AppLayout";
 import GoalsGrid from "@/components/savings/GoalsGrid";
 import SavingsChart from "@/components/charts/SavingsChart";
 import CreateGoalModal from "@/components/savingsGoals/CreateGoalModal";
-import { getSavingsGoals, type SavingsGoal } from "@/components/services/savingsService";
-import type { GoalFormData } from "@/components/savingsGoals/CreateGoalModal";
+import {
+  getSavingsGoals,
+  type SavingsGoal,
+} from "@/components/services/savingsService";
 import "./savings.css";
 
 export default function SavingsPage() {
@@ -39,14 +40,12 @@ export default function SavingsPage() {
     return () => window.removeEventListener("focus", loadGoals);
   }, []);
 
-  const handleCreateGoal = async (
-    newGoal: GoalFormData & { _id: string; createdAt: string; currentAmount?: number }
-  ) => {
+  const handleCreateGoal = async (newGoal: SavingsGoal) => {
     // Optimistic update so UI feels instant
-    setGoals((prev) => [newGoal as SavingsGoal, ...prev]);
+    setGoals((prev) => [newGoal, ...prev]);
     setIsModalOpen(false);
 
-    // Re-fetch from server so state survives reload
+    // Re-fetch from server so state is accurate
     try {
       const data = await getSavingsGoals();
       setGoals(data);
@@ -61,7 +60,10 @@ export default function SavingsPage() {
         <div className="savings-content">
           <div className="savings-header">
             <h2>Manage and track your long-term financial milestones</h2>
-            <button className="create-goal-btn" onClick={() => setIsModalOpen(true)}>
+            <button
+              className="create-goal-btn"
+              onClick={() => setIsModalOpen(true)}
+            >
               + Create New Goal
             </button>
           </div>

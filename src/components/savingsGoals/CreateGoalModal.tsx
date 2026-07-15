@@ -2,57 +2,21 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
-import { createSavingsGoal } from "@/components/services/savingsService";
+import { createSavingsGoal, type SavingsGoal } from "@/components/services/savingsService";
 import "./CreateGoalModal.css";
-
-export type GoalFormData = {
-  goalType: string;
-  goalName: string;
-  title?: string; // added to match backend field
-  targetAmount: number;
-  targetDate: string;
-  monthlyContribution: number;
-  linkedAccount: string;
-};
 
 type CreateGoalModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onCreateGoal: (
-    goal: GoalFormData & {
-      _id: string; // backend returns _id, not id
-      createdAt: string;
-      currentAmount?: number; // backend stores currentAmount, not saved
-    }
-  ) => void;
+  onCreateGoal: (goal: SavingsGoal) => void;
 };
 
 const goalTypes = [
-  {
-    id: "emergency",
-    label: "Emergency Funds",
-    icon: "🏠",
-  },
-  {
-    id: "travel",
-    label: "Travel",
-    icon: "✈️",
-  },
-  {
-    id: "business",
-    label: "Business",
-    icon: "💳",
-  },
-  {
-    id: "tax",
-    label: "Tax Reserve",
-    icon: "💰",
-  },
-  {
-    id: "custom",
-    label: "Custom",
-    icon: "✨",
-  },
+  { id: "emergency", label: "Emergency Funds", icon: "🏠" },
+  { id: "travel", label: "Travel", icon: "✈️" },
+  { id: "business", label: "Business", icon: "💳" },
+  { id: "tax", label: "Tax Reserve", icon: "💰" },
+  { id: "custom", label: "Custom", icon: "✨" },
 ];
 
 export default function CreateGoalModal({
@@ -62,17 +26,11 @@ export default function CreateGoalModal({
 }: CreateGoalModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   const [selectedGoal, setSelectedGoal] = useState("emergency");
-
   const [goalName, setGoalName] = useState("");
-
   const [targetAmount, setTargetAmount] = useState(5000);
-
   const [targetDate, setTargetDate] = useState("");
-
   const [monthlyContribution, setMonthlyContribution] = useState(500);
-
   const [linkedAccount, setLinkedAccount] = useState("");
 
   if (!isOpen) return null;
@@ -82,31 +40,27 @@ export default function CreateGoalModal({
     setError("");
 
     try {
-      const newGoal = {
+      const created = await createSavingsGoal({
         goalType: selectedGoal,
         goalName,
         targetAmount,
         targetDate,
         monthlyContribution,
         linkedAccount,
-      };
+      });
 
-      const response = await createSavingsGoal(newGoal);
-
-      onCreateGoal(response); // backend response (important later)
+      onCreateGoal(created);
       onClose();
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || "Something went wrong");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
 
   const monthsToGoal =
-    monthlyContribution > 0
-      ? Math.ceil(targetAmount / monthlyContribution)
-      : 0;
+    monthlyContribution > 0 ? Math.ceil(targetAmount / monthlyContribution) : 0;
 
   return (
     <div className="goal-modal-overlay">
@@ -116,7 +70,6 @@ export default function CreateGoalModal({
             <h2>Create New Goal</h2>
             <p>Set a target and we'll help you get there</p>
           </div>
-
           <button className="goal-close-btn" onClick={onClose}>
             <X size={18} />
           </button>
@@ -124,19 +77,15 @@ export default function CreateGoalModal({
 
         <div className="goal-section">
           <span className="section-label">GOAL TYPE</span>
-
           <div className="goal-types">
             {goalTypes.map((goal) => (
               <button
                 key={goal.id}
                 type="button"
-                className={`goal-type-card ${
-                  selectedGoal === goal.id ? "active" : ""
-                }`}
+                className={`goal-type-card ${selectedGoal === goal.id ? "active" : ""}`}
                 onClick={() => setSelectedGoal(goal.id)}
               >
                 <span className="goal-type-label">{goal.label}</span>
-
                 <span className="goal-icon">{goal.icon}</span>
               </button>
             ))}
@@ -147,7 +96,6 @@ export default function CreateGoalModal({
           <span>Target Amount</span>
           <div className="amount-input-wrapper">
             <span>$</span>
-
             <input
               type="number"
               value={targetAmount}
@@ -160,7 +108,6 @@ export default function CreateGoalModal({
         <div className="goal-form-grid">
           <div className="form-group">
             <label>Goal Name</label>
-
             <input
               type="text"
               value={goalName}
@@ -171,7 +118,6 @@ export default function CreateGoalModal({
 
           <div className="form-group">
             <label>Target Date</label>
-
             <input
               type="date"
               value={targetDate}
@@ -181,20 +127,16 @@ export default function CreateGoalModal({
 
           <div className="form-group">
             <label>Monthly Contribution</label>
-
             <input
               type="number"
               value={monthlyContribution}
-              onChange={(e) =>
-                setMonthlyContribution(Number(e.target.value))
-              }
+              onChange={(e) => setMonthlyContribution(Number(e.target.value))}
               placeholder="$500"
             />
           </div>
 
           <div className="form-group">
             <label>Linked Account</label>
-
             <input
               type="text"
               value={linkedAccount}
@@ -205,15 +147,14 @@ export default function CreateGoalModal({
         </div>
 
         <div className="goal-estimate">
-          💡 At ${monthlyContribution.toLocaleString()}/month you'll reach
-          your goal in {monthsToGoal} month{monthsToGoal !== 1 ? "s" : ""}
+          💡 At ${monthlyContribution.toLocaleString()}/month you'll reach your goal in{" "}
+          {monthsToGoal} month{monthsToGoal !== 1 ? "s" : ""}
         </div>
 
         <div className="goal-footer">
           <button className="cancel-btn" onClick={onClose}>
             Cancel
           </button>
-
           <button
             className="create-goal-btn"
             onClick={handleSubmit}
@@ -221,7 +162,6 @@ export default function CreateGoalModal({
           >
             {loading ? "Creating..." : "⊕ Create Goal"}
           </button>
-
           {error && <div className="error-message">{error}</div>}
         </div>
       </div>

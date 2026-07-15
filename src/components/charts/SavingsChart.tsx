@@ -33,51 +33,31 @@ export default function SavingsChart() {
 
       <div className="chart-wrapper">
         <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={data}
-          margin={{
-              top: 20,
-              right: 10,
-              left: 0,
-              bottom: 9.5,
-            }}>
-              
-            <CartesianGrid
-              stroke="#1e293b"
-              vertical={false}
-            />
+          <BarChart
+            data={data}
+            margin={{ top: 20, right: 10, left: 0, bottom: 9.5 }}
+          >
+            <CartesianGrid stroke="#1e293b" vertical={false} />
 
             <XAxis
               dataKey="month"
               tickLine={false}
               axisLine={false}
-
-              padding={{
-            left: 20,
-            right: 20,
-          }}
+              padding={{ left: 20, right: 20 }}
             />
 
             <YAxis
-          domain={[0, 100]}
-          ticks={[0, 25, 50, 75, 100]}
-          tickLine={false}
-          axisLine={false}
-        />
+              domain={[0, 100]}
+              ticks={[0, 25, 50, 75, 100]}
+              tickLine={false}
+              axisLine={false}
+            />
 
-            <Tooltip
-  cursor={{ fill: "transparent" }}
-/>
+            <Tooltip cursor={{ fill: "transparent" }} />
 
-            <Bar
-              dataKey="amount"
-              radius={[4, 4, 0, 0]}
-              barSize={40}
-            >
+            <Bar dataKey="amount" radius={[4, 4, 0, 0]} barSize={40}>
               {data.map((entry, index) => (
-                <Cell
-                  key={index}
-                  fill={entry.color}
-                />
+                <Cell key={index} fill={entry.color} />
               ))}
             </Bar>
           </BarChart>

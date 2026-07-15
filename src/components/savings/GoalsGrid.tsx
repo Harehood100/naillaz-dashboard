@@ -1,18 +1,8 @@
-// src/components/savings/GoalsGrid.tsx
 import GoalCard from "./GoalCard";
-
-type Goal = {
-  _id: string;
-  goalName?: string;
-  title?: string;
-  targetAmount: number;
-  targetDate: string;
-  currentAmount?: number;
-  saved?: number;
-};
+import type { SavingsGoal } from "@/components/services/savingsService";
 
 type Props = {
-  goals: Goal[];
+  goals: SavingsGoal[];
   loading?: boolean;
 };
 
@@ -32,21 +22,19 @@ export default function GoalsGrid({ goals, loading }: Props) {
         </div>
       ) : (
         goals.map((goal) => {
-          const name = goal.goalName ?? goal.title ?? "Untitled";
-          const savedAmount = goal.saved ?? goal.currentAmount ?? 0;
           const percentage =
-            savedAmount && goal.targetAmount
-              ? Math.round((savedAmount / goal.targetAmount) * 100)
+            goal.currentAmount && goal.targetAmount
+              ? Math.min(Math.round((goal.currentAmount / goal.targetAmount) * 100), 100)
               : 0;
 
           return (
             <GoalCard
               key={goal._id}
-              title={name}
-              saved={`$${Number(savedAmount).toLocaleString()}`}
+              title={goal.goalName}
+              saved={`$${Number(goal.currentAmount).toLocaleString()}`}
               target={`$${Number(goal.targetAmount).toLocaleString()}`}
               percentage={percentage}
-              completion={goal.targetDate}
+              completion={goal.targetDate || "—"}
             />
           );
         })
