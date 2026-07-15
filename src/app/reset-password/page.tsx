@@ -15,7 +15,7 @@ type FormErrors = {
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState < FormErrors > ({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
